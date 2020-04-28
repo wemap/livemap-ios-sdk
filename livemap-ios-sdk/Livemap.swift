@@ -162,7 +162,7 @@ extension wemapsdk {
         if (configuration.mapId == -1) {
             urlStr = "\(wemapsdk.baseURL)dist=ufe"
         } else {
-            urlStr = "\(wemapsdk.baseURL)token=\(configuration.token)&emmid=\(configuration.mapId)"
+            urlStr = "\(wemapsdk.baseURL)token=\(configuration.token)&emmid=\(configuration.mapId)&method=dom"
         }
 
         webView.load(
@@ -271,10 +271,42 @@ extension wemapsdk {
 
 
                 // RG stuffs
-                const onGoToPinpointClickedCallback = () => { window.webkit.messageHandlers.onGoToPinpointClicked.postMessage({type: 'goToPinpointClicked'});
+                let handler;
+                const onGoToPinpointClickedCallback = pinpoint => { window.webkit.messageHandlers.onGoToPinpointClicked.postMessage({type: 'goToPinpointClicked', data: pinpoint.pinpoint});
                 };
 
-                const onBookEventClickedCallback = () => { window.webkit.messageHandlers.onBookEventClicked.postMessage({type: 'bookEventClicked'});
+                const attachGoToPinpointClick = pinpoint => {
+                    const itineraryButton = document.getElementsByClassName('wemap-navigation-button')[0];
+                    if (itineraryButton) {
+                        handler = () => onGoToPinpointClickedCallback(pinpoint);
+                        itineraryButton.addEventListener('click', handler, {once: true});
+                    }
+                };
+
+                const detachGoToPinpointClick = () => {
+                    const itineraryButton = document.getElementsByClassName('wemap-navigation-button')[0];
+                    if (itineraryButton) {
+                        itineraryButton.removeEventListener('click', handler);
+                    }
+                };
+
+                let bookEventHandler;
+                const onBookEventClickedCallback = event => { window.webkit.messageHandlers.onBookEventClicked.postMessage({type: 'bookEventClicked', data: event.event});
+                };
+
+                const attachBookEventClick = event => {
+                    const bookEventButton = document.getElementsByClassName('wemap-template-button agenda')[0];
+                    if (bookEventButton) {
+                        bookEventHandler = () => onBookEventClickedCallback(event);
+                        bookEventButton.addEventListener('click', bookEventHandler);
+                    }
+                };
+
+                const detachBookEventClick = () => {
+                    const bookEventButton = document.getElementsByClassName('wemap-template-button agenda')[0];
+                    if (bookEventButton) {
+                        bookEventButton.removeEventListener('click', bookEventHandler);
+                        }
                 };
 
                 promise = window.livemap.addEventListener('eventOpen', onEventOpenCallback);
@@ -285,8 +317,14 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('guidingStopped', onGuidingStoppedCallback);
 
                 // RG stuffs
-                // window.livemap.addEventListener('', onGoToPinpointClickedCallback);
-                // window.livemap.addEventListener('', onBookEventClickedCallback);
+
+                // onGoToPinpointClickedCallback
+                window.livemap.addEventListener('pinpointOpen', attachGoToPinpointClick);
+                window.livemap.addEventListener('pinpointClose', detachGoToPinpointClick);
+
+                // onBookEventClickedCallback
+                window.livemap.addEventListener('eventOpen', attachBookEventClick);
+                window.livemap.addEventListener('eventClose', detachBookEventClick);
             });
         """
         webView.evaluateJavaScript(script,
