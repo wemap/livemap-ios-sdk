@@ -178,7 +178,8 @@ extension wemapsdk {
         }
 
         webView.load(
-            URLRequest(url: URL(string: urlStr)!))
+            URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
+        )
 
         return self
     }
