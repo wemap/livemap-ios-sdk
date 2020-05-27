@@ -28,12 +28,18 @@ public class WemapEvent: NSObject {
     public var name: String;
     public var eventDescription: String;
     // public var pinpoint: WemapPinpoint;
+    public var external_data: NSDictionary?
 
     init(_ json: NSDictionary) {
         self.id = json["id"] as! Int
         self.name = json["name"] as! String
         self.eventDescription = json["description"] as! String
         // self.pinpoint = json["pinpoint"] as! WemapPinpoint
+        if let external_data = json["external_data"] {
+            self.external_data = external_data as? NSDictionary
+        } else {
+            self.external_data = nil
+        }
     }
 }
 
@@ -46,6 +52,7 @@ public class WemapPinpoint: NSObject {
     // public var type: Int
     // public var category: Int
     public var pinpointDescription: String
+    public var external_data: NSDictionary?
 
     init(_ json: NSDictionary) {
         self.id = json["id"] as! Int
@@ -56,6 +63,11 @@ public class WemapPinpoint: NSObject {
         // self.type = json["type"] as! Int
         // self.category = json["category"] as! Int
         self.pinpointDescription = json["description"] as! String
+        if let external_data = json["external_data"] {
+            self.external_data = external_data as? NSDictionary
+        } else {
+            self.external_data = nil
+        }
     }
 }
 
