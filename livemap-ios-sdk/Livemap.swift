@@ -23,14 +23,16 @@ import WebKit
     @objc optional func onGoToPinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
 }
 
+/// Create a Wemap Event
 public class WemapEvent: NSObject {
-    public var id:Int
-    public var name: String;
-    public var eventDescription: String;
-    public var pinpoint: WemapPinpoint?;
-    public var external_data: NSDictionary?
+    public let id:Int
+    public let name: String;
+    public let eventDescription: String;
+    public let pinpoint: WemapPinpoint?;
+    public let external_data: NSDictionary?
 
-    init(_ json: NSDictionary) {
+    /// - Parameter json: { id, name, description, external_data }
+    public init(_ json: NSDictionary) {
         self.id = json["id"] as! Int
         self.name = json["name"] as! String
         self.eventDescription = json["description"] as! String
@@ -44,25 +46,23 @@ public class WemapEvent: NSObject {
     }
 }
 
+/// Create a Wemap Pinpoint
 public class WemapPinpoint: NSObject {
-    public var id:Int
-    public var longitude: Double
-    public var latitude: Double
-    // public var altitude: Double
-    public var name: String
+    public let id:Int
+    public let longitude: Double
+    public let latitude: Double
+    public let name: String
+    public let pinpointDescription: String
+    public let external_data: NSDictionary?
     // public var type: Int
     // public var category: Int
-    public var pinpointDescription: String
-    public var external_data: NSDictionary?
 
-    init(_ json: NSDictionary) {
+    /// - Parameter json: { id, longitude, latitude, name, description, external_data }
+    public init(_ json: NSDictionary) {
         self.id = json["id"] as! Int
         self.longitude = json["longitude"] as! Double
         self.latitude = json["latitude"] as! Double
-        // self.altitude = json["altitude"] as! Double
         self.name = json["name"] as! String
-        // self.type = json["type"] as! Int
-        // self.category = json["category"] as! Int
         self.pinpointDescription = json["description"] as! String
         if let external_data = json["external_data"] {
             self.external_data = external_data as? NSDictionary
@@ -75,11 +75,11 @@ public class WemapPinpoint: NSObject {
 public class wemapsdk: UIView, WKUIDelegate {
     public static let sharedInstance = wemapsdk(frame: CGRect.zero)
 
-    fileprivate static let baseURL = "https://livemap.getwemap.com/embed.html?"
-    fileprivate var configuration: wemapsdk_config!
-    fileprivate var webView: WKWebView!
+    private static let baseURL = "https://livemap.getwemap.com/embed.html?"
+    private var configuration: wemapsdk_config!
+    private var webView: WKWebView!
 
-    fileprivate lazy var mapViewConfig: WKWebViewConfiguration = {
+    private lazy var mapViewConfig: WKWebViewConfiguration = {
         let contentController = WKUserContentController()
 
         WebCommands.values.forEach { contentController.add(self, name: $0) }
@@ -150,12 +150,12 @@ public class wemapsdk: UIView, WKUIDelegate {
 }
 
 extension wemapsdk: WKNavigationDelegate {
-    public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+    open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 
         self.waitForReady()
     }
 
-    public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+    open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         debugPrint("didFail")
     }
 }
@@ -250,7 +250,7 @@ extension wemapsdk: WKScriptMessageHandler {
 
 extension wemapsdk {
 
-    func waitForReady() {
+    public func waitForReady() {
         let script = """
             let promise = window.livemap.waitForReady();
             promise.then(() => {
@@ -261,7 +261,7 @@ extension wemapsdk {
     }
 
 
-    func attachHandlers() {
+    private func attachHandlers() {
         let script = """
             const isReady = window.livemap.waitForReady()
             isReady.then(livemap => {
@@ -353,26 +353,35 @@ extension wemapsdk {
         })
     }
 
+    /// Open an event on the map. This can only be used for maps which use events.
+    /// - Parameter id: event id
     public func openEvent(WemapEventId id:Int) {
         let script = "promise = window.livemap.openEvent(\(id));"
         webView.evaluateJavaScript(script)
     }
 
+    /// Close the current opened event. Go to the search view.
     public func closeEvent() {
         let script = "promise = window.livemap.closeEvent();"
         webView.evaluateJavaScript(script)
     }
 
+    /// Open a pinpoint on the map.
+    /// - Parameter id: id of the pinpoint to open
     public func openPinpoint(WemapPinpointId id:Int) {
         let script = "promise = window.livemap.openPinpoint(\(id));"
         webView.evaluateJavaScript(script)
     }
 
+    /// Close the current opened pinpoint. Go to the search view.
     public func closePinpoint() {
         let script = "promise = window.livemap.closePinpoint();"
         webView.evaluateJavaScript(script)
     }
 
+    /// Update search filters (dates, tags, text).
+    /// - Parameters:
+    ///   - WemapFilters: Filters to set. See [WemapFilters](./structs/WemapFilters.md "structure WemapLocation").
     public func setFilters(WemapFilters: WemapFilters) {
         let jsonEncoder = JSONEncoder()
         let jsonData = (try? jsonEncoder.encode(WemapFilters))!
@@ -384,6 +393,11 @@ extension wemapsdk {
         }
     }
 
+    /// Start navigation to a pinpoint. The navigation will start with the user location.
+    /// - Parameters:
+    ///   - id: Id of the destination pinpoint.
+    ///   - location: For relative navigation only. Navigation start location. See [WemapLocation](./classes/WemapLocation.md "structure WemapLocation").
+    ///   - heading: For relative navigation only. Navigation start heading (in degrees).
     public func navigateToPinpoint(WemapPinpointId id:Int,
                                    location: WemapLocation? = nil,
                                    heading: Int? = nil) {
@@ -392,18 +406,25 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
 
+    /// Stop the currently running navigation.
     public func stopNavigation() {
         let script = "promise = window.livemap.stopNavigation();"
         webView.evaluateJavaScript(script)
     }
 }
 
+/// Create a map filter
 public struct WemapFilters: Codable {
     let tags: Array<String>?
     let query: String?
     let startDate: String?
     let endDate: String?
 
+    /// - Parameters:
+    ///   - tags: The queried tags
+    ///   - query: The queried keywords
+    ///   - startDate: The start date as yyyy-mm-dd
+    ///   - endDate: The end date as yyyy-mm-dd
     public init(tags: Array<String>? = nil,
                 query: String? = nil,
                 startDate: String? = nil,
@@ -415,10 +436,15 @@ public struct WemapFilters: Codable {
     }
 }
 
+/// Create a Wemap location
 public struct WemapLocation: Codable {
-    let longitude: Double?
-    let latitude: Double?
+    private let longitude: Double?
+    private let latitude: Double?
 
+
+    /// - Parameters:
+    ///   - longitude: The longitude
+    ///   - latitude: The latitude
     public init(longitude: Double,
                 latitude: Double) {
         self.longitude = longitude
