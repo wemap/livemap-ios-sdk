@@ -6,6 +6,20 @@
 	objectVersion = 50;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		06516E3A2458261100027677 /* universal */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 06516E3B2458261100027677 /* Build configuration list for PBXAggregateTarget "universal" */;
+			buildPhases = (
+				06516E3E2458261800027677 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = universal;
+			productName = universal;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		06BDC41C2400133F00527F0F /* livemap_ios_sdk.h in Headers */ = {isa = PBXBuildFile; fileRef = 06BDC41A2400133F00527F0F /* livemap_ios_sdk.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		06BDC423240014FD00527F0F /* Livemap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BDC422240014FD00527F0F /* Livemap.swift */; };
@@ -113,6 +127,9 @@
 				LastUpgradeCheck = 1030;
 				ORGANIZATIONNAME = "Bertrand Mathieu-Daudé";
 				TargetAttributes = {
+					06516E3A2458261100027677 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
 					06BDC4162400133F00527F0F = {
 						CreatedOnToolsVersion = 10.3;
 						LastSwiftMigration = 1030;
@@ -132,6 +149,7 @@
 			projectRoot = "";
 			targets = (
 				06BDC4162400133F00527F0F /* livemap-ios-sdk */,
+				06516E3A2458261100027677 /* universal */,
 			);
 		};
 /* End PBXProject section */
@@ -146,6 +164,26 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		06516E3E2458261800027677 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n# Build device and Simulator version\nxcodebuild -target \"${PROJECT_NAME}\" ONLY_ACTIVE_ARCH=NO -configuration ${CONFIGURATION} -sdk iphoneos  BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" build\n\nxcodebuild -target \"${PROJECT_NAME}\" -configuration ${CONFIGURATION} -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO BUILD_DIR=\"${BUILD_DIR}\" BUILD_ROOT=\"${BUILD_ROOT}\" build\n# Create Framework director in project\nmkdir -p ${PROJECT_DIR}/${PROJECT_NAME}/Library\n\n#Create fat binary\nlipo -create \"${TARGET_BUILD_DIR}/../Debug-iphoneos/lib${PROJECT_NAME}.a\" \"${TARGET_BUILD_DIR}/../Debug-iphonesimulator/lib${PROJECT_NAME}.a\" -output \"${PROJECT_DIR}/${PROJECT_NAME}/Library/lib${PROJECT_NAME}.a\"\n# open Finder library\nopen \"${PROJECT_DIR}/${PROJECT_NAME}/Library\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		06BDC4132400133F00527F0F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -159,6 +197,24 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		06516E3C2458261100027677 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 64DXV5M5R8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		06516E3D2458261100027677 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 64DXV5M5R8;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		06BDC41D2400133F00527F0F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -355,6 +411,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		06516E3B2458261100027677 /* Build configuration list for PBXAggregateTarget "universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				06516E3C2458261100027677 /* Debug */,
+				06516E3D2458261100027677 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		06BDC4112400133F00527F0F /* Build configuration list for PBXProject "livemap-ios-sdk" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
