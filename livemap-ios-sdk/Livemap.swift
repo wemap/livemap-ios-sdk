@@ -27,14 +27,15 @@ public class WemapEvent: NSObject {
     public var id:Int
     public var name: String;
     public var eventDescription: String;
-    // public var pinpoint: WemapPinpoint;
+    public var pinpoint: WemapPinpoint?;
     public var external_data: NSDictionary?
 
     init(_ json: NSDictionary) {
         self.id = json["id"] as! Int
         self.name = json["name"] as! String
         self.eventDescription = json["description"] as! String
-        // self.pinpoint = json["pinpoint"] as! WemapPinpoint
+        // self.pinpoint = json["point"] as? WemapPinpoint ?? nil // pareil que:
+        self.pinpoint = WemapPinpoint(json["point"] as! NSDictionary)
         if let external_data = json["external_data"] {
             self.external_data = external_data as? NSDictionary
         } else {
@@ -71,7 +72,7 @@ public class WemapPinpoint: NSObject {
     }
 }
 
-public class wemapsdk: UIView {
+public class wemapsdk: UIView, WKUIDelegate {
     public static let sharedInstance = wemapsdk(frame: CGRect.zero)
 
     fileprivate static let baseURL = "https://livemap.getwemap.com/embed.html?"
@@ -94,6 +95,7 @@ public class wemapsdk: UIView {
         super.init(frame: frame)
         webView = WKWebView(frame: frame, configuration: mapViewConfig)
         webView.navigationDelegate = self
+        webView.uiDelegate = self
 
         configuration = wemapsdk_config(token: "", mapId: -1)
         self.addSubview(webView)
@@ -385,6 +387,7 @@ extension wemapsdk {
     public func navigateToPinpoint(WemapPinpointId id:Int,
                                    location: WemapLocation? = nil,
                                    heading: Int? = nil) {
+        self.openPinpoint(WemapPinpointId:id)
         let script = "promise = window.livemap.navigateToPinpoint(\(id));"
         webView.evaluateJavaScript(script)
     }
