@@ -30,10 +30,9 @@
 		06BDC44B24001EA500527F0F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
-			dstPath = "/Users/bertrand/app/livemap-ios-sdk-sample/livemap-ios-sdk-sample/Frameworks";
+			dstPath = "";
 			dstSubfolderSpec = 0;
 			files = (
-				06BDC44D24001F3B00527F0F /* livemap_ios_sdk.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
