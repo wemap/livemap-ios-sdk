@@ -24,6 +24,9 @@
 		06BDC41C2400133F00527F0F /* livemap_ios_sdk.h in Headers */ = {isa = PBXBuildFile; fileRef = 06BDC41A2400133F00527F0F /* livemap_ios_sdk.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		06BDC423240014FD00527F0F /* Livemap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06BDC422240014FD00527F0F /* Livemap.swift */; };
 		06F6069A2404206200EF43C1 /* WemapSDKActionsDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F606992404206200EF43C1 /* WemapSDKActionsDelegate.swift */; };
+		06F8C673253F2775003B51B3 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F8C672253F2775003B51B3 /* CameraView.swift */; };
+		06F8C67C2540704A003B51B3 /* CustomARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F8C67B2540704A003B51B3 /* CustomARView.swift */; };
+		06F8C67E2540707C003B51B3 /* CustomARView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 06F8C67D2540707C003B51B3 /* CustomARView.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,6 +47,9 @@
 		06BDC41B2400133F00527F0F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		06BDC422240014FD00527F0F /* Livemap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Livemap.swift; sourceTree = "<group>"; };
 		06F606992404206200EF43C1 /* WemapSDKActionsDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WemapSDKActionsDelegate.swift; sourceTree = "<group>"; };
+		06F8C672253F2775003B51B3 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		06F8C67B2540704A003B51B3 /* CustomARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARView.swift; sourceTree = "<group>"; };
+		06F8C67D2540707C003B51B3 /* CustomARView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomARView.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +66,8 @@
 		06BDC40D2400133F00527F0F = {
 			isa = PBXGroup;
 			children = (
+				06F8C67D2540707C003B51B3 /* CustomARView.xib */,
+				06F8C67B2540704A003B51B3 /* CustomARView.swift */,
 				06BDC4192400133F00527F0F /* livemap-ios-sdk */,
 				06BDC4182400133F00527F0F /* Products */,
 			);
@@ -76,12 +84,21 @@
 		06BDC4192400133F00527F0F /* livemap-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				06F8C671253F2753003B51B3 /* utils */,
 				06BDC41A2400133F00527F0F /* livemap_ios_sdk.h */,
 				06BDC41B2400133F00527F0F /* Info.plist */,
 				06BDC422240014FD00527F0F /* Livemap.swift */,
 				06F606992404206200EF43C1 /* WemapSDKActionsDelegate.swift */,
 			);
 			path = "livemap-ios-sdk";
+			sourceTree = "<group>";
+		};
+		06F8C671253F2753003B51B3 /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				06F8C672253F2775003B51B3 /* CameraView.swift */,
+			);
+			path = utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -158,6 +175,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				06F8C67E2540707C003B51B3 /* CustomARView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -188,7 +206,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				06F8C673253F2775003B51B3 /* CameraView.swift in Sources */,
 				06F6069A2404206200EF43C1 /* WemapSDKActionsDelegate.swift in Sources */,
+				06F8C67C2540704A003B51B3 /* CustomARView.swift in Sources */,
 				06BDC423240014FD00527F0F /* Livemap.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
