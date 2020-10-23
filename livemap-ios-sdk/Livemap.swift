@@ -183,7 +183,7 @@ extension wemapsdk {
 
         var urlStr = ""
         if (configuration.mapId == -1) {
-            urlStr = "\(wemapsdk.baseURL)dist=ufe"
+            urlStr = "\(wemapsdk.baseURL)dist=ufe&arviewenabled=true&method=dom"
         } else {
             urlStr = "\(wemapsdk.baseURL)token=\(configuration.token)&emmid=\(configuration.mapId)&method=dom"
         }
