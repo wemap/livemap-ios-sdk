@@ -78,6 +78,7 @@ public class wemapsdk: UIView, WKUIDelegate {
     private static let baseURL = "https://livemap.getwemap.com/embed.html?"
     private var configuration: wemapsdk_config!
     private var webView: WKWebView!
+    private var arView: CustomARView!
 
     private lazy var mapViewConfig: WKWebViewConfiguration = {
         let contentController = WKUserContentController()
@@ -97,8 +98,14 @@ public class wemapsdk: UIView, WKUIDelegate {
         webView.navigationDelegate = self
         webView.uiDelegate = self
 
-        configuration = wemapsdk_config(token: "", mapId: -1)
-        self.addSubview(webView)
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
+
+        arView = CustomARView(frame: frame)
+        arView.set(webMapView: webView)
+
+        self.addSubview(arView)
     }
 
     public required init?(coder aDecoder: NSCoder) {
@@ -109,6 +116,7 @@ public class wemapsdk: UIView, WKUIDelegate {
         super.layoutSubviews()
 
         webView.frame = self.bounds
+        arView.frame = self.bounds
     }
 
     func onLoadingFinished() {
@@ -170,6 +178,7 @@ extension wemapsdk {
         view.addSubview(self)
         self.frame = view.bounds
 
+        arView.frame = self.bounds
         webView.frame = self.bounds
 
         var urlStr = ""
@@ -197,6 +206,14 @@ extension wemapsdk: WKScriptMessageHandler {
         case .onLoadingFinished:
             self.attachHandlers()
             onLoadingFinished()
+
+        case .onStartCamera:
+            // debugPrint("ENABLE_CAMERA")
+            startCamera()
+
+        case .onStopCamera:
+            // debugPrint("DISABLE_CAMERA")
+            stopCamera()
 
         case .onEventOpen:
             // debugPrint("EVENT_OPEN")
@@ -242,6 +259,9 @@ extension wemapsdk: WKScriptMessageHandler {
             let pinpoint = WemapPinpoint(pinpointData)
             onGoToPinpointClicked(pinpoint)
 
+        case .log:
+            debugPrint("Log From webview: \(message.body)")
+
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
         }
@@ -284,6 +304,12 @@ extension wemapsdk {
                 const onGuidingStoppedCallback = () => { window.webkit.messageHandlers.onGuidingStopped.postMessage({type: 'guidingStopped'});
                 };
 
+                // AR
+                const onStartCameraCallback = () => { window.webkit.messageHandlers.onStartCamera.postMessage({type: 'cameraStarted'});
+                };
+
+                const onStopCameraCallback = () => { window.webkit.messageHandlers.onStopCamera.postMessage({type: 'cameraStoped'});
+                };
 
                 // RG stuffs
                 let handler;
@@ -331,6 +357,15 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('guidingStarted', onGuidingStartedCallback);
                 promise = window.livemap.addEventListener('guidingStopped', onGuidingStoppedCallback);
 
+                // attach start/stopCamera handler
+                try {
+                    window.WemapSDK = {};
+                    window.WemapSDK.enableCameraNative = onStartCameraCallback;
+                    window.WemapSDK.disableCameraNative = onStopCameraCallback
+                } catch (e) {
+                    window.webkit.messageHandlers.log.postMessage(e.message);
+                }
+
                 // RG stuffs
 
                 // onGoToPinpointClickedCallback
@@ -377,6 +412,14 @@ extension wemapsdk {
     public func closePinpoint() {
         let script = "promise = window.livemap.closePinpoint();"
         webView.evaluateJavaScript(script)
+    }
+
+    private func startCamera(){
+        arView.set(isHidden: false)
+    }
+
+    private func stopCamera(){
+        arView.set(isHidden: true)
     }
 
     /// Update search filters (dates, tags, text).
@@ -472,6 +515,9 @@ enum WebCommands: String {
     case onPinpointClose
     case onGuidingStarted
     case onGuidingStopped
+    case onStartCamera
+    case onStopCamera
+    case log
 
     // RG stuffs
     case onBookEventClicked
@@ -485,6 +531,9 @@ enum WebCommands: String {
                          onPinpointClose.rawValue,
                          onGuidingStarted.rawValue,
                          onGuidingStopped.rawValue,
+                         onStartCamera.rawValue,
+                         onStopCamera.rawValue,
+                         log.rawValue,
                          onBookEventClicked.rawValue,
                          onGoToPinpointClicked.rawValue]
 }
