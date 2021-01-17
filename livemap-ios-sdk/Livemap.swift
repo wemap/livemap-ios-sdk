@@ -193,7 +193,7 @@ extension wemapsdk {
 
         var urlStr = ""
         if (configuration.mapId == -1) {
-            urlStr = "\(wemapsdk.baseURL)dist=ufe&arviewenabled=true&method=dom"
+            urlStr = "\(wemapsdk.baseURL)dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
         } else {
             urlStr = "\(wemapsdk.baseURL)token=\(configuration.token)&emmid=\(configuration.mapId)&method=dom"
         }
