@@ -77,7 +77,6 @@ public class WemapPinpoint: NSObject {
 public class wemapsdk: UIView, WKUIDelegate {
     public static let sharedInstance = wemapsdk(frame: CGRect.zero)
 
-    private static let baseURL = "https://livemapdev.maaap.it/embed.html?"
     private var configuration: wemapsdk_config!
     private var webView: WKWebView!
     private var arView: CustomARView!
@@ -190,12 +189,12 @@ extension wemapsdk {
 
         arView.frame = self.bounds
         webView.frame = self.bounds
-
-        var urlStr = ""
-        if (configuration.mapId == -1) {
-            urlStr = "\(wemapsdk.baseURL)dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
+        
+        var urlStr = configuration.webappEndpoint + "/embed.html?"
+        if (configuration.ufe) {
+            urlStr += "dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
         } else {
-            urlStr = "\(wemapsdk.baseURL)token=\(configuration.token)&emmid=\(configuration.mapId)&method=dom"
+            urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&method=dom"
         }
 
         webView.load(
@@ -527,13 +526,19 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String, mapId: Int) {
+    public init(token: String, ufe: Bool?, emmid: Int?, webappEndpoint: String?) {
         self.token = token
-        self.mapId = mapId
+        self.emmid = emmid ?? 0
+        self.ufe = ufe ?? false
+        self.webappEndpoint = webappEndpoint ?? wemapsdk_config.defaultWebappEndpoint
     }
+    
+    private static let defaultWebappEndpoint = "https://livemapdev.maaap.it"
 
     public let token: String
-    public let mapId: Int
+    public let emmid: Int
+    public let ufe: Bool
+    public let webappEndpoint: String
 }
 
 enum WebCommands: String {
