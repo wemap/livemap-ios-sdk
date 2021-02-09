@@ -526,8 +526,8 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String, ufe: Bool?, emmid: Int?, webappEndpoint: String?) {
-        self.token = token
+    public init(token: String?, ufe: Bool?, emmid: Int?, webappEndpoint: String?) {
+        self.token = token ?? ""
         self.emmid = emmid ?? 0
         self.ufe = ufe ?? false
         self.webappEndpoint = webappEndpoint ?? wemapsdk_config.defaultWebappEndpoint
