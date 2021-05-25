@@ -87,6 +87,7 @@ public class wemapsdk: UIView, WKUIDelegate {
         WebCommands.values.forEach { contentController.add(self, name: $0) }
 
         let config = WKWebViewConfiguration()
+        config.allowsInlineMediaPlayback = true
         config.userContentController = contentController
         return config
     }()
