@@ -534,7 +534,7 @@ public struct wemapsdk_config {
         self.webappEndpoint = webappEndpoint ?? wemapsdk_config.defaultWebappEndpoint
     }
     
-    private static let defaultWebappEndpoint = "https://livemapdev.maaap.it"
+    private static let defaultWebappEndpoint = "https://livemap.getwemap.com"
 
     public let token: String
     public let emmid: Int
