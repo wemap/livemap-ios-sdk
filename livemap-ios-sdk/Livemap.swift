@@ -527,19 +527,21 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String?, emmid: Int?, livemapRootUrl: String?) {
+    public init(token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil) {
         self.token = token ?? ""
-        self.emmid = emmid ?? nil
-        if emmid == nil {
+        if let mapId = mapId {
+            self.emmid = mapId
+        } else {
+            self.emmid = -1
             self.ufe = true
         }
-        self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.livemapRootUrl
+        self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl
     }
     
-    private static let livemapRootUrl = "https://livemap.getwemap.com"
+    public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
 
     public let token: String
-    public let emmid: Int?
+    public let emmid: Int
     public var ufe: Bool = false
     public let livemapRootUrl: String
 }
