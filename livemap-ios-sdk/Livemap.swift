@@ -17,6 +17,8 @@ import WebKit
     @objc optional func onPinpointClose(_ wemapController: wemapsdk)
     @objc optional func onGuidingStarted(_ wemapController: wemapsdk)
     @objc optional func onGuidingStopped(_ wemapController: wemapsdk)
+    @objc optional func onUserLogin(_ wemapController: wemapsdk)
+    @objc optional func onUserLogout(_ wemapController: wemapsdk)
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -75,7 +77,6 @@ public class WemapPinpoint: NSObject {
 public class wemapsdk: UIView, WKUIDelegate {
     public static let sharedInstance = wemapsdk(frame: CGRect.zero)
 
-    private static let baseURL = "https://livemap.getwemap.com/embed.html?"
     private var configuration: wemapsdk_config!
     private var webView: WKWebView!
     private var arView: CustomARView!
@@ -86,6 +87,7 @@ public class wemapsdk: UIView, WKUIDelegate {
         WebCommands.values.forEach { contentController.add(self, name: $0) }
 
         let config = WKWebViewConfiguration()
+        config.allowsInlineMediaPlayback = true
         config.userContentController = contentController
         return config
     }()
@@ -155,6 +157,14 @@ public class wemapsdk: UIView, WKUIDelegate {
     func onGoToPinpointClicked(_ pinpoint: WemapPinpoint) {
         delegate?.onGoToPinpointClicked!(self, pinpoint: pinpoint)
     }
+    
+    func onUserLogin() {
+        delegate?.onUserLogin!(self)
+    }
+    
+    func onUserLogout() {
+        delegate?.onUserLogout!(self)
+    }
 }
 
 extension wemapsdk: WKNavigationDelegate {
@@ -180,12 +190,12 @@ extension wemapsdk {
 
         arView.frame = self.bounds
         webView.frame = self.bounds
-
-        var urlStr = ""
-        if (configuration.mapId == -1) {
-            urlStr = "\(wemapsdk.baseURL)dist=ufe&arviewenabled=true&method=dom"
+        
+        var urlStr = configuration.webappEndpoint + "/embed.html?"
+        if (configuration.ufe) {
+            urlStr += "dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
         } else {
-            urlStr = "\(wemapsdk.baseURL)token=\(configuration.token)&emmid=\(configuration.mapId)&method=dom"
+            urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&method=dom"
         }
 
         webView.load(
@@ -261,6 +271,14 @@ extension wemapsdk: WKScriptMessageHandler {
 
         case .log:
             debugPrint("Log From webview: \(message.body)")
+            
+        case .onUserLogin:
+            // debugPrint("USER_LOGIN")
+            onUserLogin()
+            
+        case .onUserLogout:
+            // debugPrint("USER_LOGOUT")
+            onUserLogout()
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -302,6 +320,12 @@ extension wemapsdk {
                 };
 
                 const onGuidingStoppedCallback = () => { window.webkit.messageHandlers.onGuidingStopped.postMessage({type: 'guidingStopped'});
+                };
+
+                const onUserLoginCallback = () => { window.webkit.messageHandlers.onUserLogin.postMessage({type: 'userLogin'});
+                };
+
+                const onUserLogoutCallback = () => { window.webkit.messageHandlers.onUserLogout.postMessage({type: 'userLogout'});
                 };
 
                 // AR
@@ -356,6 +380,8 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('pinpointClose', onPinpointCloseCallback);
                 promise = window.livemap.addEventListener('guidingStarted', onGuidingStartedCallback);
                 promise = window.livemap.addEventListener('guidingStopped', onGuidingStoppedCallback);
+                promise = window.livemap.addEventListener('userLogin', onUserLoginCallback);
+                promise = window.livemap.addEventListener('userLogout', onUserLogoutCallback);
 
                 // attach start/stopCamera handler
                 try {
@@ -454,6 +480,11 @@ extension wemapsdk {
         let script = "promise = window.livemap.stopNavigation();"
         webView.evaluateJavaScript(script)
     }
+    
+    public func signInByToken(accessToken: String, refreshToken: String) {
+        let script = "promise = window.livemap.signInByToken('\(accessToken)', '\(refreshToken)');"
+        webView.evaluateJavaScript(script)
+    }
 }
 
 /// Create a map filter
@@ -496,13 +527,19 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String, mapId: Int) {
-        self.token = token
-        self.mapId = mapId
+    public init(token: String?, ufe: Bool?, emmid: Int?, webappEndpoint: String?) {
+        self.token = token ?? ""
+        self.emmid = emmid ?? 0
+        self.ufe = ufe ?? false
+        self.webappEndpoint = webappEndpoint ?? wemapsdk_config.defaultWebappEndpoint
     }
+    
+    private static let defaultWebappEndpoint = "https://livemap.getwemap.com"
 
     public let token: String
-    public let mapId: Int
+    public let emmid: Int
+    public let ufe: Bool
+    public let webappEndpoint: String
 }
 
 enum WebCommands: String {
@@ -518,6 +555,8 @@ enum WebCommands: String {
     case onStartCamera
     case onStopCamera
     case log
+    case onUserLogin
+    case onUserLogout
 
     // RG stuffs
     case onBookEventClicked
@@ -535,5 +574,7 @@ enum WebCommands: String {
                          onStopCamera.rawValue,
                          log.rawValue,
                          onBookEventClicked.rawValue,
-                         onGoToPinpointClicked.rawValue]
+                         onGoToPinpointClicked.rawValue,
+                         onUserLogin.rawValue,
+                         onUserLogout.rawValue]
 }
