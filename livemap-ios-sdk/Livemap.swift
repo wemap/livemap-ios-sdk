@@ -191,7 +191,7 @@ extension wemapsdk {
         arView.frame = self.bounds
         webView.frame = self.bounds
         
-        var urlStr = configuration.webappEndpoint + "/embed.html?"
+        var urlStr = configuration.livemapRootUrl + "/embed.html?"
         if (configuration.ufe) {
             urlStr += "dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
         } else {
@@ -527,19 +527,21 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String?, ufe: Bool?, emmid: Int?, webappEndpoint: String?) {
+    public init(token: String?, emmid: Int?, livemapRootUrl: String?) {
         self.token = token ?? ""
-        self.emmid = emmid ?? 0
-        self.ufe = ufe ?? false
-        self.webappEndpoint = webappEndpoint ?? wemapsdk_config.defaultWebappEndpoint
+        self.emmid = emmid ?? nil
+        if emmid == nil {
+            self.ufe = true
+        }
+        self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.livemapRootUrl
     }
     
-    private static let defaultWebappEndpoint = "https://livemap.getwemap.com"
+    private static let livemapRootUrl = "https://livemap.getwemap.com"
 
     public let token: String
-    public let emmid: Int
-    public let ufe: Bool
-    public let webappEndpoint: String
+    public let emmid: Int?
+    public var ufe: Bool = false
+    public let livemapRootUrl: String
 }
 
 enum WebCommands: String {
