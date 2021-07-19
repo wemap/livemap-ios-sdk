@@ -159,11 +159,11 @@ public class wemapsdk: UIView, WKUIDelegate {
     }
     
     func onUserLogin() {
-        delegate?.onUserLogin!(self)
+        delegate?.onUserLogin?(self)
     }
     
     func onUserLogout() {
-        delegate?.onUserLogout!(self)
+        delegate?.onUserLogout?(self)
     }
 }
 
