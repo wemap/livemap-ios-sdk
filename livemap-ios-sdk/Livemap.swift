@@ -191,6 +191,12 @@ extension wemapsdk {
         arView.frame = self.bounds
         webView.frame = self.bounds
         
+        loadMapUrl()
+
+        return self
+    }
+
+    public func loadMapUrl() {
         var urlStr = configuration.livemapRootUrl + "/embed.html?"
         if (configuration.ufe) {
             urlStr += "dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
@@ -202,7 +208,6 @@ extension wemapsdk {
             URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
         )
 
-        return self
     }
 }
 
