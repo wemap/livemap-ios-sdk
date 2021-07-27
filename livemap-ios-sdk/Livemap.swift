@@ -19,6 +19,7 @@ import WebKit
     @objc optional func onGuidingStopped(_ wemapController: wemapsdk)
     @objc optional func onUserLogin(_ wemapController: wemapsdk)
     @objc optional func onUserLogout(_ wemapController: wemapsdk)
+    @objc optional func onUrlChange(_ wemapController: wemapsdk, previousUrl: String, nextUrl: String)
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -80,6 +81,7 @@ public class wemapsdk: UIView, WKUIDelegate {
     private var configuration: wemapsdk_config!
     private var webView: WKWebView!
     private var arView: CustomARView!
+    private var currentUrl: String = ""
 
     private lazy var mapViewConfig: WKWebViewConfiguration = {
         let contentController = WKUserContentController()
@@ -92,6 +94,20 @@ public class wemapsdk: UIView, WKUIDelegate {
         return config
     }()
 
+    public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if let key = change?[NSKeyValueChangeKey.newKey] {
+            switch keyPath {
+                case #keyPath(WKWebView.url):
+                    let previousUrl: String = self.currentUrl
+                    let nextUrl: String = String(describing: key)
+                    onUrlChange(previousUrl: previousUrl, nextUrl: nextUrl);
+                    self.currentUrl = nextUrl
+                default:
+                    print("keyPath: \(String(describing: keyPath)) change")
+            }
+        }
+    }
+
     weak open var delegate: wemapsdkViewDelegate?
 
     override private init(frame: CGRect) {
@@ -103,6 +119,8 @@ public class wemapsdk: UIView, WKUIDelegate {
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
+
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
 
         arView = CustomARView(frame: frame)
         arView.set(webMapView: webView)
@@ -159,11 +177,15 @@ public class wemapsdk: UIView, WKUIDelegate {
     }
     
     func onUserLogin() {
-        delegate?.onUserLogin!(self)
+        delegate?.onUserLogin?(self)
     }
     
     func onUserLogout() {
-        delegate?.onUserLogout!(self)
+        delegate?.onUserLogout?(self)
+    }
+
+    func onUrlChange(previousUrl: String, nextUrl: String) {
+        delegate?.onUrlChange?(self, previousUrl: previousUrl, nextUrl: nextUrl)
     }
 }
 
@@ -191,6 +213,12 @@ extension wemapsdk {
         arView.frame = self.bounds
         webView.frame = self.bounds
         
+        loadMapUrl()
+
+        return self
+    }
+
+    public func loadMapUrl() {
         var urlStr = configuration.livemapRootUrl + "/embed.html?"
         if (configuration.ufe) {
             urlStr += "dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
@@ -202,7 +230,9 @@ extension wemapsdk {
             URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
         )
 
-        return self
+        if(self.currentUrl == nil) {
+            self.currentUrl = urlStr;
+        }
     }
 }
 
