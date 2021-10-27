@@ -51,7 +51,7 @@ public class WemapEvent: NSObject {
 
 /// Create a Wemap Pinpoint
 public class WemapPinpoint: NSObject {
-    private let data:NSDictionary
+    public let data:NSDictionary
     public let id:Int
     public let longitude: Double
     public let latitude: Double
