@@ -154,7 +154,7 @@ public class wemapsdk: UIView, WKUIDelegate {
     }
 
     func onLoadingFinished() {
-        delegate?.waitForReady!(self)
+        delegate?.waitForReady?(self)
     }
 
     func onEventOpen(_ event: WemapEvent) {
