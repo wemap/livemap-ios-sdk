@@ -533,9 +533,14 @@ extension wemapsdk {
         let script = "promise = window.livemap.stopNavigation();"
         webView.evaluateJavaScript(script)
     }
-    
-    public func signInByToken(accessToken: String, refreshToken: String) {
-        let script = "promise = window.livemap.signInByToken('\(accessToken)', '\(refreshToken)');"
+
+    public func enableSidebar() {
+        let script = "promise = window.livemap.enableSidebar();"
+        webView.evaluateJavaScript(script)
+    }
+
+    public func disableSidebar() {
+        let script = "promise = window.livemap.disableSidebar();"
         webView.evaluateJavaScript(script)
     }
 }
