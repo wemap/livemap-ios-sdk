@@ -538,11 +538,13 @@ extension wemapsdk {
         let script = "promise = window.livemap.signInByToken('\(accessToken)', '\(refreshToken)');"
     }
 
+    /// Activate the bar with several rows of content (of events, pinpoints, list, etc).
     public func enableSidebar() {
         let script = "promise = window.livemap.enableSidebar();"
         webView.evaluateJavaScript(script)
     }
 
+    /// Deactivate the bar with several rows of content (of events, pinpoints, list, etc).
     public func disableSidebar() {
         let script = "promise = window.livemap.disableSidebar();"
         webView.evaluateJavaScript(script)
