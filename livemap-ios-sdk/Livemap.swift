@@ -158,36 +158,36 @@ public class wemapsdk: UIView, WKUIDelegate {
     }
 
     func onEventOpen(_ event: WemapEvent) {
-        delegate?.onEventOpen!(self, event: event)
+        delegate?.onEventOpen?(self, event: event)
     }
 
     func onPinpointOpen(_ pinpoint: WemapPinpoint) {
-        delegate?.onPinpointOpen!(self, pinpoint: pinpoint)
+        delegate?.onPinpointOpen?(self, pinpoint: pinpoint)
     }
 
     func onEventClose() {
-        delegate?.onEventClose!(self)
+        delegate?.onEventClose?(self)
     }
 
     func onPinpointClose() {
-        delegate?.onPinpointClose!(self)
+        delegate?.onPinpointClose?(self)
     }
 
     func onGuidingStart() {
-        delegate?.onGuidingStarted!(self)
+        delegate?.onGuidingStarted?(self)
     }
 
     func onGuidingStopped() {
-        delegate?.onGuidingStopped!(self)
+        delegate?.onGuidingStopped?(self)
     }
 
     // RG stuffs
     func onBookEventClicked(_ event: WemapEvent) {
-        delegate?.onBookEventClicked!(self, event: event)
+        delegate?.onBookEventClicked?(self, event: event)
     }
 
     func onGoToPinpointClicked(_ pinpoint: WemapPinpoint) {
-        delegate?.onGoToPinpointClicked!(self, pinpoint: pinpoint)
+        delegate?.onGoToPinpointClicked?(self, pinpoint: pinpoint)
     }
     
     func onUserLogin() {
