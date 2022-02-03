@@ -534,6 +534,10 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
 
+    public func signInByToken(accessToken: String, refreshToken: String) {
+        let script = "promise = window.livemap.signInByToken('\(accessToken)', '\(refreshToken)');"
+    }
+
     public func enableSidebar() {
         let script = "promise = window.livemap.enableSidebar();"
         webView.evaluateJavaScript(script)
