@@ -51,6 +51,7 @@ public class WemapEvent: NSObject {
 
 /// Create a Wemap Pinpoint
 public class WemapPinpoint: NSObject {
+    public let data:NSDictionary
     public let id:Int
     public let longitude: Double
     public let latitude: Double
@@ -62,6 +63,7 @@ public class WemapPinpoint: NSObject {
 
     /// - Parameter json: { id, longitude, latitude, name, description, external_data }
     public init(_ json: NSDictionary) {
+        self.data = json
         self.id = json["id"] as! Int
         self.longitude = json["longitude"] as! Double
         self.latitude = json["latitude"] as! Double
@@ -72,6 +74,18 @@ public class WemapPinpoint: NSObject {
         } else {
             self.external_data = nil
         }
+    }
+    
+    public func toJson() -> Data? {
+        do {
+            return try JSONSerialization.data(withJSONObject: self.data, options: [])
+        } catch {
+            return nil
+        }
+    }
+
+    public func toJsonString() -> String {
+        return String(data: self.toJson()!, encoding: String.Encoding.ascii)!
     }
 }
 
@@ -467,6 +481,15 @@ extension wemapsdk {
     /// Close the current opened pinpoint. Go to the search view.
     public func closePinpoint() {
         let script = "promise = window.livemap.closePinpoint();"
+        webView.evaluateJavaScript(script)
+    }
+    
+    /// Populates the map with given pinpoints.
+    /// - Parameter pinpoints: pinpoints to populate the map.
+    // WemapPinpoints pinpoints: [WemapPinpoint]
+    public func setPinpoints(WemapPinpoints pinpoints: [WemapPinpoint]) {
+        let pinpointsStrings = pinpoints.map { $0.toJsonString() }.joined(separator: ", ")
+        let script = "promise = window.livemap.setPinpoints([\(pinpointsStrings)]);"
         webView.evaluateJavaScript(script)
     }
 
