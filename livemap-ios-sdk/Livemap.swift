@@ -154,40 +154,40 @@ public class wemapsdk: UIView, WKUIDelegate {
     }
 
     func onLoadingFinished() {
-        delegate?.waitForReady!(self)
+        delegate?.waitForReady?(self)
     }
 
     func onEventOpen(_ event: WemapEvent) {
-        delegate?.onEventOpen!(self, event: event)
+        delegate?.onEventOpen?(self, event: event)
     }
 
     func onPinpointOpen(_ pinpoint: WemapPinpoint) {
-        delegate?.onPinpointOpen!(self, pinpoint: pinpoint)
+        delegate?.onPinpointOpen?(self, pinpoint: pinpoint)
     }
 
     func onEventClose() {
-        delegate?.onEventClose!(self)
+        delegate?.onEventClose?(self)
     }
 
     func onPinpointClose() {
-        delegate?.onPinpointClose!(self)
+        delegate?.onPinpointClose?(self)
     }
 
     func onGuidingStart() {
-        delegate?.onGuidingStarted!(self)
+        delegate?.onGuidingStarted?(self)
     }
 
     func onGuidingStopped() {
-        delegate?.onGuidingStopped!(self)
+        delegate?.onGuidingStopped?(self)
     }
 
     // RG stuffs
     func onBookEventClicked(_ event: WemapEvent) {
-        delegate?.onBookEventClicked!(self, event: event)
+        delegate?.onBookEventClicked?(self, event: event)
     }
 
     func onGoToPinpointClicked(_ pinpoint: WemapPinpoint) {
-        delegate?.onGoToPinpointClicked!(self, pinpoint: pinpoint)
+        delegate?.onGoToPinpointClicked?(self, pinpoint: pinpoint)
     }
     
     func onUserLogin() {
@@ -233,11 +233,11 @@ extension wemapsdk {
     }
 
     public func loadMapUrl() {
-        var urlStr = configuration.livemapRootUrl + "/embed.html?"
+        var urlStr = configuration.livemapRootUrl + "/dom.html?"
         if (configuration.ufe) {
-            urlStr += "dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
+            urlStr += "dist=ufe&arviewenabled=true&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false&clicktofullscreen=false"
         } else {
-            urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&method=dom"
+            urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&clicktofullscreen=false"
         }
 
         webView.load(
@@ -533,9 +533,20 @@ extension wemapsdk {
         let script = "promise = window.livemap.stopNavigation();"
         webView.evaluateJavaScript(script)
     }
-    
+
     public func signInByToken(accessToken: String, refreshToken: String) {
         let script = "promise = window.livemap.signInByToken('\(accessToken)', '\(refreshToken)');"
+    }
+
+    /// Activate the bar with several rows of content (of events, pinpoints, list, etc).
+    public func enableSidebar() {
+        let script = "promise = window.livemap.enableSidebar();"
+        webView.evaluateJavaScript(script)
+    }
+
+    /// Deactivate the bar with several rows of content (of events, pinpoints, list, etc).
+    public func disableSidebar() {
+        let script = "promise = window.livemap.disableSidebar();"
         webView.evaluateJavaScript(script)
     }
 }
