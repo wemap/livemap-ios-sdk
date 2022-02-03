@@ -233,11 +233,11 @@ extension wemapsdk {
     }
 
     public func loadMapUrl() {
-        var urlStr = configuration.livemapRootUrl + "/embed.html?"
+        var urlStr = configuration.livemapRootUrl + "/dom.html?"
         if (configuration.ufe) {
-            urlStr += "dist=ufe&arviewenabled=true&method=dom&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false"
+            urlStr += "dist=ufe&arviewenabled=true&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false&clicktofullscreen=false"
         } else {
-            urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&method=dom"
+            urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&clicktofullscreen=false"
         }
 
         webView.load(
