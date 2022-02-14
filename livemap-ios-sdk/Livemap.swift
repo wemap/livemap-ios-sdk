@@ -452,15 +452,15 @@ extension wemapsdk {
                 };
 
                 const onLivemapMovedCallback = (json) => {
-                    window.webkit.messageHandlers.onLivemapMoved.postMessage({type: 'livemapMoved'}, JSON.stringify(json));
+                    window.webkit.messageHandlers.onLivemapMoved.postMessage({type: 'livemapMoved', data: json});
                 };
 
                 const onMapClickCallback = (json) => {
-                    window.webkit.messageHandlers.onMapClick.postMessage({type: 'mapClick'}, JSON.stringify(json));
+                    window.webkit.messageHandlers.onMapClick.postMessage({type: 'mapClick', data: json});
                 };
 
                 const onMapLongClickCallback = (json) => {
-                    window.webkit.messageHandlers.onMapLongClick.postMessage({type: 'mapLongClick'}, JSON.stringify(json));
+                    window.webkit.messageHandlers.onMapLongClick.postMessage({type: 'mapLongClick', data: json});
                 };
 
                 promise = window.livemap.addEventListener('eventOpen', onEventOpenCallback);
@@ -472,8 +472,8 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('userLogin', onUserLoginCallback);
                 promise = window.livemap.addEventListener('userLogout', onUserLogoutCallback);
                 promise = window.livemap.addEventListener('livemapMoved', onLivemapMovedCallback);
-                promise = window.livemap.addEventListener('mapClik', onMapMovedCallback);
-                promise = window.livemap.addEventListener('mapLongClik', onMapLongMovedCallback);
+                promise = window.livemap.addEventListener('mapClick', onMapClickCallback);
+                promise = window.livemap.addEventListener('mapLongClick', onMapLongClickCallback);
 
                 // attach start/stopCamera handler
                 try {
