@@ -24,6 +24,10 @@ import WebKit
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
     @objc optional func onGoToPinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
+    
+    @objc optional func onLivemapMoved(_ wemapController: wemapsdk, jsonString: String)
+    @objc optional func onMapClick(_ wemapController: wemapsdk, jsonString: String)
+    @objc optional func onMapLongClick(_ wemapController: wemapsdk, jsonString: String)
 }
 
 /// Create a Wemap Event
@@ -201,6 +205,18 @@ public class wemapsdk: UIView, WKUIDelegate {
     func onUrlChange(previousUrl: String, nextUrl: String) {
         delegate?.onUrlChange?(self, previousUrl: previousUrl, nextUrl: nextUrl)
     }
+    
+    func onLivemapMoved(jsonString: String) {
+        delegate?.onLivemapMoved?(self, jsonString: jsonString)
+    }
+    
+    func onMapClick(jsonString: String) {
+        delegate?.onMapClick?(self, jsonString: jsonString)
+    }
+    
+    func onMapLongClick(jsonString: String) {
+        delegate?.onMapClick?(self, jsonString: jsonString)
+    }
 }
 
 extension wemapsdk: WKNavigationDelegate {
@@ -238,13 +254,18 @@ extension wemapsdk {
             urlStr += "dist=ufe&arviewenabled=true&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false&clicktofullscreen=false"
         } else {
             urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&clicktofullscreen=false"
+
+            if (configuration.maxbounds != "")
+            {
+                urlStr += "&maxbounds=\(configuration.maxbounds)"
+            }
         }
 
         webView.load(
             URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
         )
 
-        if(self.currentUrl == nil) {
+        if (self.currentUrl == "") {
             self.currentUrl = urlStr;
         }
     }
@@ -323,6 +344,18 @@ extension wemapsdk: WKScriptMessageHandler {
         case .onUserLogout:
             // debugPrint("USER_LOGOUT")
             onUserLogout()
+
+        case .onLivemapMoved:
+            let s = message.body as? String
+            onLivemapMoved(jsonString: s!)
+
+        case .onMapClick:
+            let s = message.body as? String
+            onMapClick(jsonString: s!)
+       
+        case .onMapLongClick:
+            let s = message.body as? String
+            onMapLongClick(jsonString: s!)
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -418,6 +451,18 @@ extension wemapsdk {
                         }
                 };
 
+                const onLivemapMovedCallback = (json) => {
+                    window.webkit.messageHandlers.onLivemapMoved.postMessage({type: 'livemapMoved'}, JSON.stringify(json));
+                };
+
+                const onMapClickCallback = (json) => {
+                    window.webkit.messageHandlers.onMapClick.postMessage({type: 'mapClick'}, JSON.stringify(json));
+                };
+
+                const onMapLongClickCallback = (json) => {
+                    window.webkit.messageHandlers.onMapLongClick.postMessage({type: 'mapLongClick'}, JSON.stringify(json));
+                };
+
                 promise = window.livemap.addEventListener('eventOpen', onEventOpenCallback);
                 promise = window.livemap.addEventListener('pinpointOpen', onPinpointOpenCallback);
                 promise = window.livemap.addEventListener('eventClose', onEventCloseCallback);
@@ -426,6 +471,9 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('guidingStopped', onGuidingStoppedCallback);
                 promise = window.livemap.addEventListener('userLogin', onUserLoginCallback);
                 promise = window.livemap.addEventListener('userLogout', onUserLogoutCallback);
+                promise = window.livemap.addEventListener('livemapMoved', onLivemapMovedCallback);
+                promise = window.livemap.addEventListener('mapClik', onMapMovedCallback);
+                promise = window.livemap.addEventListener('mapLongClik', onMapLongMovedCallback);
 
                 // attach start/stopCamera handler
                 try {
@@ -493,11 +541,11 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
 
-    private func startCamera(){
+    private func startCamera() {
         arView.set(isHidden: false)
     }
 
-    private func stopCamera(){
+    private func stopCamera() {
         arView.set(isHidden: true)
     }
 
@@ -536,6 +584,7 @@ extension wemapsdk {
 
     public func signInByToken(accessToken: String, refreshToken: String) {
         let script = "promise = window.livemap.signInByToken('\(accessToken)', '\(refreshToken)');"
+        webView.evaluateJavaScript(script)
     }
 
     /// Activate the bar with several rows of content (of events, pinpoints, list, etc).
@@ -547,6 +596,20 @@ extension wemapsdk {
     /// Deactivate the bar with several rows of content (of events, pinpoints, list, etc).
     public func disableSidebar() {
         let script = "promise = window.livemap.disableSidebar();"
+        webView.evaluateJavaScript(script)
+    }
+
+    /// Sign out the current user.
+    public func signOut() {
+        let script = "promise = window.livemap.signOut();"
+        webView.evaluateJavaScript(script)
+    }
+
+    /// Define one or more lists to be displayed on the map in addition of the current pinpoints of the map.
+    /// - Parameters:
+    ///   - lists: list of sources
+    public func setSourceLists(lists: Array<Int>) {
+        let script = "promise = window.livemap.setSourceLists('\(lists)');"
         webView.evaluateJavaScript(script)
     }
 }
@@ -591,7 +654,7 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil) {
+    public init(token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil, maxbound: String? = nil) {
         self.token = token ?? ""
         if let mapId = mapId {
             self.emmid = mapId
@@ -600,14 +663,16 @@ public struct wemapsdk_config {
             self.ufe = true
         }
         self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl
+        self.maxbounds = livemapRootUrl ?? ""
     }
-    
+
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
 
     public let token: String
     public let emmid: Int
     public var ufe: Bool = false
     public let livemapRootUrl: String
+    public let maxbounds: String
 }
 
 enum WebCommands: String {
@@ -629,6 +694,10 @@ enum WebCommands: String {
     // RG stuffs
     case onBookEventClicked
     case onGoToPinpointClicked
+    
+    case onLivemapMoved
+    case onMapClick
+    case onMapLongClick
 
     static let values = [parametersLoaded.rawValue,
                          onLoadingFinished.rawValue,
@@ -644,5 +713,8 @@ enum WebCommands: String {
                          onBookEventClicked.rawValue,
                          onGoToPinpointClicked.rawValue,
                          onUserLogin.rawValue,
-                         onUserLogout.rawValue]
+                         onUserLogout.rawValue,
+                         onLivemapMoved.rawValue,
+                         onMapClick.rawValue,
+                         onMapLongClick.rawValue]
 }
