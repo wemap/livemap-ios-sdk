@@ -27,6 +27,8 @@
 		06F8C673253F2775003B51B3 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F8C672253F2775003B51B3 /* CameraView.swift */; };
 		06F8C67C2540704A003B51B3 /* CustomARView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06F8C67B2540704A003B51B3 /* CustomARView.swift */; };
 		06F8C67E2540707C003B51B3 /* CustomARView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 06F8C67D2540707C003B51B3 /* CustomARView.xib */; };
+		224D88D227BD3CB0007C82D4 /* StructExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224D88D127BD3CB0007C82D4 /* StructExtensions.swift */; };
+		2298E16E27BAC79E00DC3503 /* JSONStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2298E16D27BAC79E00DC3503 /* JSONStructs.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -50,6 +52,8 @@
 		06F8C672253F2775003B51B3 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		06F8C67B2540704A003B51B3 /* CustomARView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomARView.swift; sourceTree = "<group>"; };
 		06F8C67D2540707C003B51B3 /* CustomARView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomARView.xib; sourceTree = "<group>"; };
+		224D88D127BD3CB0007C82D4 /* StructExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructExtensions.swift; sourceTree = "<group>"; };
+		2298E16D27BAC79E00DC3503 /* JSONStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONStructs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +88,7 @@
 		06BDC4192400133F00527F0F /* livemap-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				224D88D027BD3C93007C82D4 /* model */,
 				06F8C671253F2753003B51B3 /* utils */,
 				06BDC41A2400133F00527F0F /* livemap_ios_sdk.h */,
 				06BDC41B2400133F00527F0F /* Info.plist */,
@@ -99,6 +104,15 @@
 				06F8C672253F2775003B51B3 /* CameraView.swift */,
 			);
 			path = utils;
+			sourceTree = "<group>";
+		};
+		224D88D027BD3C93007C82D4 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				2298E16D27BAC79E00DC3503 /* JSONStructs.swift */,
+				224D88D127BD3CB0007C82D4 /* StructExtensions.swift */,
+			);
+			path = model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -210,6 +224,8 @@
 				06F6069A2404206200EF43C1 /* WemapSDKActionsDelegate.swift in Sources */,
 				06F8C67C2540704A003B51B3 /* CustomARView.swift in Sources */,
 				06BDC423240014FD00527F0F /* Livemap.swift in Sources */,
+				224D88D227BD3CB0007C82D4 /* StructExtensions.swift in Sources */,
+				2298E16E27BAC79E00DC3503 /* JSONStructs.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -421,6 +437,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.getwemap.livemap-ios-sdk";
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "armv7 arm64 x86_64 armv7s arm64e i386";
