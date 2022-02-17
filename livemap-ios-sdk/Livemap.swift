@@ -25,7 +25,7 @@ import WebKit
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
     @objc optional func onGoToPinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
     
-    @objc optional func onLivemapMoved(_ wemapController: wemapsdk, jsonString: String)
+    @objc optional func onMapMoved(_ wemapController: wemapsdk, jsonString: String)
     @objc optional func onMapClick(_ wemapController: wemapsdk, jsonString: String)
     @objc optional func onMapLongClick(_ wemapController: wemapsdk, jsonString: String)
 }
@@ -206,16 +206,23 @@ public class wemapsdk: UIView, WKUIDelegate {
         delegate?.onUrlChange?(self, previousUrl: previousUrl, nextUrl: nextUrl)
     }
     
-    func onLivemapMoved(jsonString: String) {
-        delegate?.onLivemapMoved?(self, jsonString: jsonString)
+    // Objective C cannot epose the swift struct and we do not want to make a new NSObject
+    func onMapMoved(parsedStruct: MapMoved) {
+        if let jsonString = MapMoved.toJsonString(parsedStruct: parsedStruct) {
+            delegate?.onMapMoved?(self, jsonString: jsonString)
+        }
     }
     
-    func onMapClick(jsonString: String) {
-        delegate?.onMapClick?(self, jsonString: jsonString)
+    func onMapClick(parsedStruct: Coordinates) {
+        if let jsonString = Coordinates.toJsonString(parsedStruct: parsedStruct) {
+            delegate?.onMapClick?(self, jsonString: jsonString)
+        }
     }
     
-    func onMapLongClick(jsonString: String) {
-        delegate?.onMapClick?(self, jsonString: jsonString)
+    func onMapLongClick(parsedStruct: Coordinates) {
+        if let jsonString = Coordinates.toJsonString(parsedStruct: parsedStruct) {
+            delegate?.onMapLongClick?(self, jsonString: jsonString)
+        }
     }
 }
 
@@ -255,12 +262,14 @@ extension wemapsdk {
         } else {
             urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&clicktofullscreen=false"
 
-            if (configuration.maxbounds != "")
+            if (configuration.maxbounds != nil)
             {
-                urlStr += "&maxbounds=\(configuration.maxbounds)"
+                if let box: String = wemapsdk_config.maxBoundsToUrl(maxbounds: configuration.maxbounds) {
+                    // without encoding, URL() becomes nil during creation
+                    urlStr += "&maxbounds=" + box.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+                }
             }
         }
-
         webView.load(
             URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
         )
@@ -273,7 +282,7 @@ extension wemapsdk {
 
 extension wemapsdk: WKScriptMessageHandler {
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        // debugPrint("\(#function) :::: message [\(message.name)] :::: with body: \n\(message.body)\n<<<")
+        //debugPrint("\(#function) :::: message [\(message.name)] :::: with body: \n\(message.body)\n<<<")
 
         guard let command = WebCommands(rawValue: message.name) else { return }
         switch command {
@@ -346,16 +355,26 @@ extension wemapsdk: WKScriptMessageHandler {
             onUserLogout()
 
         case .onLivemapMoved:
-            let s = message.body as? String
-            onLivemapMoved(jsonString: s!)
+            // https://stackoverflow.com/questions/64992931/how-do-i-convert-a-wkscriptmessage-body-to-a-struct
+            if let bodyDict = message.body as? NSDictionary {
+                if let parsedStruct: MapMoved = MapMoved.map(dict: bodyDict) {
+                    onMapMoved(parsedStruct: parsedStruct)
+                }
+            }
 
         case .onMapClick:
-            let s = message.body as? String
-            onMapClick(jsonString: s!)
+            if let bodyDict = message.body as? NSDictionary {
+                if let parsedStruct: Coordinates = Coordinates.map(dict: bodyDict) {
+                    onMapClick(parsedStruct: parsedStruct)
+                }
+            }
        
         case .onMapLongClick:
-            let s = message.body as? String
-            onMapLongClick(jsonString: s!)
+            if let bodyDict = message.body as? NSDictionary {
+                if let parsedStruct: Coordinates = Coordinates.map(dict: bodyDict) {
+                    onMapLongClick(parsedStruct: parsedStruct)
+                }
+            }
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -452,15 +471,15 @@ extension wemapsdk {
                 };
 
                 const onLivemapMovedCallback = (json) => {
-                    window.webkit.messageHandlers.onLivemapMoved.postMessage({type: 'livemapMoved', data: json});
+                    window.webkit.messageHandlers.onLivemapMoved.postMessage(json);
                 };
 
                 const onMapClickCallback = (json) => {
-                    window.webkit.messageHandlers.onMapClick.postMessage({type: 'mapClick', data: json});
+                    window.webkit.messageHandlers.onMapClick.postMessage(json);
                 };
 
                 const onMapLongClickCallback = (json) => {
-                    window.webkit.messageHandlers.onMapLongClick.postMessage({type: 'mapLongClick', data: json});
+                    window.webkit.messageHandlers.onMapLongClick.postMessage(json);
                 };
 
                 promise = window.livemap.addEventListener('eventOpen', onEventOpenCallback);
@@ -654,7 +673,7 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil, maxbound: String? = nil) {
+    public init(token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil, maxbounds: BoundingBox? = nil) {
         self.token = token ?? ""
         if let mapId = mapId {
             self.emmid = mapId
@@ -663,16 +682,40 @@ public struct wemapsdk_config {
             self.ufe = true
         }
         self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl
-        self.maxbounds = livemapRootUrl ?? ""
+        self.maxbounds = maxbounds ?? nil
     }
 
-    public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
+    //public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
+    public static let defaultLivemapRootUrl = "https://livemapstaging.maaap.it"
+
+    public static func maxBoundsFromUrl(maxbounds: String) -> BoundingBox? {
+        if let parsedStruct: MaxBoundsSnippet = MaxBoundsSnippet.map(string: maxbounds) {
+            let result: BoundingBox = BoundingBox(
+                northEast: Coordinates(latitude: parsedStruct._northEast?.lat, longitude: parsedStruct._northEast?.lng, altitude: nil),
+                southWest: Coordinates(latitude: parsedStruct._southWest?.lat, longitude: parsedStruct._southWest?.lng, altitude: nil)
+            )
+            return result
+        }
+        return nil
+    }
+
+    public static func maxBoundsToUrl(maxbounds: BoundingBox?) -> String? {
+        if (maxbounds == nil) {
+            return nil
+        }
+        let maxbounds2: BoundingBox = maxbounds!
+        let result: MaxBoundsSnippet = MaxBoundsSnippet(
+            _northEast: MaxBoundsSnippetCoords(lat: maxbounds2.northEast?.latitude, lng: maxbounds2.northEast?.longitude),
+            _southWest: MaxBoundsSnippetCoords(lat: maxbounds2.southWest?.latitude, lng: maxbounds2.southWest?.longitude)
+        )
+        return MaxBoundsSnippet.toJsonString(parsedStruct: result)
+    }
 
     public let token: String
     public let emmid: Int
     public var ufe: Bool = false
     public let livemapRootUrl: String
-    public let maxbounds: String
+    public let maxbounds: BoundingBox?
 }
 
 enum WebCommands: String {
