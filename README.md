@@ -19,6 +19,6 @@ Il faut le zipper puis le commiter.
 brew update
 brew install p7zip
 
-7z a ./releases/v1.6.0/livemap_ios_sdk.xcframework.zip ./releases/v1.6.0/livemap_ios_sdk.xcframework
+7z a ./releases/v1.6.0/livemap_ios_sdk.xcframework.zip ./xcframework/livemap_ios_sdk.xcframework
 dangerous command!!
 rm -rf ./releases/v1.6.0/livemap_ios_sdk.xcframework

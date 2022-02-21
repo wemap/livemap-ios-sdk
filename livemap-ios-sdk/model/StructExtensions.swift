@@ -35,4 +35,22 @@ extension Encodable { // Codable + Decodable = Codable
         } catch { print(error) }
         return nil
     }
+    
+    static func toNSDictionary(parsedStruct: Self) -> NSDictionary? {
+        let jsonString = Self.toJsonString(parsedStruct: parsedStruct)
+        if (jsonString == nil) {
+            return nil
+        }
+        if let data = jsonString!.data(using: String.Encoding.utf8) {
+            do {
+                if let dict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    // try to read out a string array
+                    return dict as NSDictionary?
+                }
+            } catch let error as NSError {
+                print(error)
+            }
+        }
+        return nil
+    }
 }
