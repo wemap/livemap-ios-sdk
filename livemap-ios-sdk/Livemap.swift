@@ -25,9 +25,9 @@ import WebKit
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
     @objc optional func onGoToPinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
     
-    @objc optional func onMapMoved(_ wemapController: wemapsdk, jsonString: String)
-    @objc optional func onMapClick(_ wemapController: wemapsdk, jsonString: String)
-    @objc optional func onMapLongClick(_ wemapController: wemapsdk, jsonString: String)
+    @objc optional func onMapMoved(_ wemapController: wemapsdk, json: NSDictionary)
+    @objc optional func onMapClick(_ wemapController: wemapsdk, json: NSDictionary)
+    @objc optional func onMapLongClick(_ wemapController: wemapsdk, json: NSDictionary)
 }
 
 /// Create a Wemap Event
@@ -206,22 +206,22 @@ public class wemapsdk: UIView, WKUIDelegate {
         delegate?.onUrlChange?(self, previousUrl: previousUrl, nextUrl: nextUrl)
     }
     
-    // Objective C cannot epose the swift struct and we do not want to make a new NSObject
+    // Objective C uses a NSDictionary
     func onMapMoved(parsedStruct: MapMoved) {
-        if let jsonString = MapMoved.toJsonString(parsedStruct: parsedStruct) {
-            delegate?.onMapMoved?(self, jsonString: jsonString)
+        if let json = MapMoved.toNSDictionary(parsedStruct: parsedStruct) {
+            delegate?.onMapMoved?(self, json: json)
         }
     }
     
     func onMapClick(parsedStruct: Coordinates) {
-        if let jsonString = Coordinates.toJsonString(parsedStruct: parsedStruct) {
-            delegate?.onMapClick?(self, jsonString: jsonString)
+        if let json = Coordinates.toNSDictionary(parsedStruct: parsedStruct) {
+            delegate?.onMapClick?(self, json: json)
         }
     }
     
     func onMapLongClick(parsedStruct: Coordinates) {
-        if let jsonString = Coordinates.toJsonString(parsedStruct: parsedStruct) {
-            delegate?.onMapLongClick?(self, jsonString: jsonString)
+        if let json = Coordinates.toNSDictionary(parsedStruct: parsedStruct) {
+            delegate?.onMapLongClick?(self, json: json)
         }
     }
 }
@@ -626,9 +626,9 @@ extension wemapsdk {
 
     /// Define one or more lists to be displayed on the map in addition of the current pinpoints of the map.
     /// - Parameters:
-    ///   - lists: list of sources
-    public func setSourceLists(lists: Array<Int>) {
-        let script = "promise = window.livemap.setSourceLists('\(lists)');"
+    ///   - sourceLists: list of sources
+    public func setSourceLists(sourceLists: Array<Int>) {
+        let script = "promise = window.livemap.setSourceLists(\(sourceLists));"
         webView.evaluateJavaScript(script)
     }
 }
@@ -685,8 +685,11 @@ public struct wemapsdk_config {
         self.maxbounds = maxbounds ?? nil
     }
 
-    //public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
-    public static let defaultLivemapRootUrl = "https://livemapstaging.maaap.it"
+    public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
+
+    public static func boundingBoxFromNSDictionary(dict: NSDictionary) -> BoundingBox? {
+        return BoundingBox.map(dict: dict)
+    }
 
     public static func maxBoundsFromUrl(maxbounds: String) -> BoundingBox? {
         if let parsedStruct: MaxBoundsSnippet = MaxBoundsSnippet.map(string: maxbounds) {
