@@ -601,8 +601,9 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
 
-    public func signInByToken(accessToken: String, refreshToken: String) {
-        let script = "promise = window.livemap.signInByToken('\(accessToken)', '\(refreshToken)');"
+    /// Sign in to the UFE with a Wemap token.
+    public func signInByToken(accessToken: String) {
+        let script = "promise = window.livemap.signInByToken('\(accessToken)');";
         webView.evaluateJavaScript(script)
     }
 
@@ -629,6 +630,12 @@ extension wemapsdk {
     ///   - sourceLists: list of sources
     public func setSourceLists(sourceLists: Array<Int>) {
         let script = "promise = window.livemap.setSourceLists(\(sourceLists));"
+        webView.evaluateJavaScript(script)
+    }
+
+    /// Center the map on the user's location.
+    public func aroundMe() {
+        let script = "promise = window.livemap.aroundMe();";
         webView.evaluateJavaScript(script)
     }
 }
