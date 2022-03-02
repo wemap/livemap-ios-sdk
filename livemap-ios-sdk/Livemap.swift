@@ -269,6 +269,19 @@ extension wemapsdk {
                     urlStr += "&maxbounds=" + box.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
                 }
             }
+
+            if (configuration.introcard != nil)
+            {
+                if let introcard: String = wemapsdk_config.introcardToUrl(introcard: configuration.introcard) {
+                    // without encoding, URL() becomes nil during creation
+                    urlStr += "&introcard=" + introcard.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+                }
+            }
+
+            if (configuration.urlParameters != nil)
+            {
+                urlStr += "&" + configuration.urlParameters!.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+            }
         }
         webView.load(
             URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
@@ -638,6 +651,18 @@ extension wemapsdk {
         let script = "promise = window.livemap.aroundMe();";
         webView.evaluateJavaScript(script)
     }
+
+    /// Disable analytics tracking
+    public func disableAnalytics() {
+        let script = "promise = window.livemap.disableAnalytics();"
+        webView.evaluateJavaScript(script)
+    }
+
+    /// Enable analytics tracking
+    public func enableAnalytics() {
+        let script = "promise = window.livemap.enableAnalytics();"
+        webView.evaluateJavaScript(script)
+    }
 }
 
 /// Create a map filter
@@ -680,7 +705,11 @@ public struct WemapLocation: Codable {
 }
 
 public struct wemapsdk_config {
-    public init(token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil, maxbounds: BoundingBox? = nil) {
+    public init(
+        token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil, maxbounds: BoundingBox? = nil,
+        introcard: IntroCardParameter? = nil,
+        urlParameters: [String]? = nil
+    ) {
         self.token = token ?? ""
         if let mapId = mapId {
             self.emmid = mapId
@@ -690,6 +719,9 @@ public struct wemapsdk_config {
         }
         self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl
         self.maxbounds = maxbounds ?? nil
+        self.introcard = introcard ?? nil
+        let join1 = urlParameters?.joined(separator: "&")
+        self.urlParameters = join1 ?? nil
     }
 
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
@@ -721,11 +753,20 @@ public struct wemapsdk_config {
         return MaxBoundsSnippet.toJsonString(parsedStruct: result)
     }
 
+    public static func introcardToUrl(introcard: IntroCardParameter?) -> String? {
+        if (introcard == nil) {
+            return nil
+        }
+        return IntroCardParameter.toJsonString(parsedStruct: introcard!)
+    }
+
     public let token: String
     public let emmid: Int
     public var ufe: Bool = false
     public let livemapRootUrl: String
     public let maxbounds: BoundingBox?
+    public let introcard: IntroCardParameter?
+    public let urlParameters: String?
 }
 
 enum WebCommands: String {
