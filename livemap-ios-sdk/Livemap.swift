@@ -280,9 +280,11 @@ extension wemapsdk {
 
             if (configuration.urlParameters != nil)
             {
-                urlStr += "&" + configuration.urlParameters!.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+                let join1 = configuration.urlParameters!.joined(separator: "&")
+                urlStr += "&" + join1.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
             }
         }
+
         webView.load(
             URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
         )
@@ -720,14 +722,17 @@ public struct wemapsdk_config {
         self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl
         self.maxbounds = maxbounds ?? nil
         self.introcard = introcard ?? nil
-        let join1 = urlParameters?.joined(separator: "&")
-        self.urlParameters = join1 ?? nil
+        self.urlParameters = urlParameters ?? nil
     }
 
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
 
     public static func boundingBoxFromNSDictionary(dict: NSDictionary) -> BoundingBox? {
         return BoundingBox.map(dict: dict)
+    }
+
+    public static func introcardFromNSDictionary(dict: NSDictionary) -> IntroCardParameter? {
+        return IntroCardParameter.map(dict: dict)
     }
 
     public static func maxBoundsFromUrl(maxbounds: String) -> BoundingBox? {
@@ -766,7 +771,7 @@ public struct wemapsdk_config {
     public let livemapRootUrl: String
     public let maxbounds: BoundingBox?
     public let introcard: IntroCardParameter?
-    public let urlParameters: String?
+    public let urlParameters: [String]?
 }
 
 enum WebCommands: String {
