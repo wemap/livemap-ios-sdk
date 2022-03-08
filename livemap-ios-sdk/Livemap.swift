@@ -24,6 +24,7 @@ import WebKit
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
     @objc optional func onGoToPinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
+    @objc optional func onLikePinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
     
     @objc optional func onMapMoved(_ wemapController: wemapsdk, json: NSDictionary)
     @objc optional func onMapClick(_ wemapController: wemapsdk, json: NSDictionary)
@@ -193,7 +194,11 @@ public class wemapsdk: UIView, WKUIDelegate {
     func onGoToPinpointClicked(_ pinpoint: WemapPinpoint) {
         delegate?.onGoToPinpointClicked?(self, pinpoint: pinpoint)
     }
-    
+
+    func onLikePinpointClicked(_ pinpoint: WemapPinpoint) {
+        delegate?.onLikePinpointClicked?(self, pinpoint: pinpoint)
+    }
+
     func onUserLogin() {
         delegate?.onUserLogin?(self)
     }
@@ -357,6 +362,13 @@ extension wemapsdk: WKScriptMessageHandler {
             let pinpointData = (json["data"] as? NSDictionary)!
             let pinpoint = WemapPinpoint(pinpointData)
             onGoToPinpointClicked(pinpoint)
+            
+        case .onLikePinpointClicked:
+            // debugPrint("ON_LIKE_PINPOINT_CLICKED")
+            guard let json = message.body as? [String: Any] else { return }
+            let pinpointData = (json["data"] as? NSDictionary)!
+            let pinpoint = WemapPinpoint(pinpointData)
+            onLikePinpointClicked(pinpoint)
 
         case .log:
             debugPrint("Log From webview: \(message.body)")
@@ -452,7 +464,7 @@ extension wemapsdk {
                 };
 
                 const attachGoToPinpointClick = pinpoint => {
-                    const itineraryButton = document.getElementsByClassName('wemap-navigation-button')[0];
+                    const itineraryButton = document.querySelector('.petal_directions, .wemap-action-button-direction');
                     if (itineraryButton) {
                         handler = () => onGoToPinpointClickedCallback(pinpoint);
                         itineraryButton.addEventListener('click', handler, {once: true});
@@ -460,7 +472,25 @@ extension wemapsdk {
                 };
 
                 const detachGoToPinpointClick = () => {
-                    const itineraryButton = document.getElementsByClassName('wemap-navigation-button')[0];
+                    const itineraryButton = document.querySelector('.petal_directions, .wemap-action-button-direction');
+                    if (itineraryButton) {
+                        itineraryButton.removeEventListener('click', handler);
+                    }
+                };
+        
+                const onLikePinpointClickedCallback = pinpoint => { window.webkit.messageHandlers.onLikePinpointClicked.postMessage({type: 'likePinpointClicked', data: pinpoint.pinpoint});
+                };
+
+                const attachLikePinpointClick = pinpoint => {
+                    const itineraryButton = document.querySelector('.petal_like, .wemap-action-button-like');
+                    if (itineraryButton) {
+                        handler = () => onLikePinpointClickedCallback(pinpoint);
+                        itineraryButton.addEventListener('click', handler, {once: true});
+                    }
+                };
+
+                const detachLikePinpointClick = () => {
+                    const itineraryButton = document.querySelector('.petal_like, .wemap-action-button-like');
                     if (itineraryButton) {
                         itineraryButton.removeEventListener('click', handler);
                     }
@@ -523,6 +553,10 @@ extension wemapsdk {
                 // onGoToPinpointClickedCallback
                 window.livemap.addEventListener('pinpointOpen', attachGoToPinpointClick);
                 window.livemap.addEventListener('pinpointClose', detachGoToPinpointClick);
+        
+                // onLikePinpointClickedCallback
+                window.livemap.addEventListener('pinpointOpen', attachLikePinpointClick);
+                window.livemap.addEventListener('pinpointClose', detachLikePinpointClick);
 
                 // onBookEventClickedCallback
                 window.livemap.addEventListener('eventOpen', attachBookEventClick);
@@ -793,6 +827,7 @@ enum WebCommands: String {
     // RG stuffs
     case onBookEventClicked
     case onGoToPinpointClicked
+    case onLikePinpointClicked
     
     case onLivemapMoved
     case onMapClick
@@ -811,6 +846,7 @@ enum WebCommands: String {
                          log.rawValue,
                          onBookEventClicked.rawValue,
                          onGoToPinpointClicked.rawValue,
+                         onLikePinpointClicked.rawValue,
                          onUserLogin.rawValue,
                          onUserLogout.rawValue,
                          onLivemapMoved.rawValue,
