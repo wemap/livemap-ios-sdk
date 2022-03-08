@@ -25,7 +25,7 @@ import WebKit
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
     @objc optional func onGoToPinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
     @objc optional func onLikePinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
-    
+
     @objc optional func onMapMoved(_ wemapController: wemapsdk, json: NSDictionary)
     @objc optional func onMapClick(_ wemapController: wemapsdk, json: NSDictionary)
     @objc optional func onMapLongClick(_ wemapController: wemapsdk, json: NSDictionary)
@@ -381,7 +381,7 @@ extension wemapsdk: WKScriptMessageHandler {
             // debugPrint("USER_LOGOUT")
             onUserLogout()
 
-        case .onLivemapMoved:
+        case .onMapMoved:
             // https://stackoverflow.com/questions/64992931/how-do-i-convert-a-wkscriptmessage-body-to-a-struct
             if let bodyDict = message.body as? NSDictionary {
                 if let parsedStruct: MapMoved = MapMoved.map(dict: bodyDict) {
@@ -478,7 +478,7 @@ extension wemapsdk {
                     }
                 };
         
-                const onLikePinpointClickedCallback = pinpoint => { window.webkit.messageHandlers.onLikePinpointClicked.postMessage({type: 'likePinpointClicked', data: pinpoint.pinpoint});
+                const onLikePinpointClickedCallback = pinpoint => { window.webkit.messageHandlers.onLikePinpointClicked.postMessage({type: 'likePinpointClicked', data: pinpoint});
                 };
 
                 const attachLikePinpointClick = pinpoint => {
@@ -515,8 +515,8 @@ extension wemapsdk {
                         }
                 };
 
-                const onLivemapMovedCallback = (json) => {
-                    window.webkit.messageHandlers.onLivemapMoved.postMessage(json);
+                const onMapMovedCallback = (json) => {
+                    window.webkit.messageHandlers.onMapMoved.postMessage(json);
                 };
 
                 const onMapClickCallback = (json) => {
@@ -535,7 +535,7 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('guidingStopped', onGuidingStoppedCallback);
                 promise = window.livemap.addEventListener('userLogin', onUserLoginCallback);
                 promise = window.livemap.addEventListener('userLogout', onUserLogoutCallback);
-                promise = window.livemap.addEventListener('livemapMoved', onLivemapMovedCallback);
+                promise = window.livemap.addEventListener('mapMoved', onMapMovedCallback);
                 promise = window.livemap.addEventListener('mapClick', onMapClickCallback);
                 promise = window.livemap.addEventListener('mapLongClick', onMapLongClickCallback);
 
@@ -829,7 +829,7 @@ enum WebCommands: String {
     case onGoToPinpointClicked
     case onLikePinpointClicked
     
-    case onLivemapMoved
+    case onMapMoved
     case onMapClick
     case onMapLongClick
 
@@ -849,7 +849,7 @@ enum WebCommands: String {
                          onLikePinpointClicked.rawValue,
                          onUserLogin.rawValue,
                          onUserLogout.rawValue,
-                         onLivemapMoved.rawValue,
+                         onMapMoved.rawValue,
                          onMapClick.rawValue,
                          onMapLongClick.rawValue]
 }
