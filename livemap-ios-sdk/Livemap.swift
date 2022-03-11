@@ -460,6 +460,7 @@ extension wemapsdk {
 
                 // RG stuffs
                 let handler;
+                let handler2;
                 const onGoToPinpointClickedCallback = pinpoint => { window.webkit.messageHandlers.onGoToPinpointClicked.postMessage({type: 'goToPinpointClicked', data: pinpoint.pinpoint});
                 };
 
@@ -478,21 +479,21 @@ extension wemapsdk {
                     }
                 };
         
-                const onLikePinpointClickedCallback = pinpoint => { window.webkit.messageHandlers.onLikePinpointClicked.postMessage({type: 'likePinpointClicked', data: pinpoint});
+                const onLikePinpointClickedCallback = pinpoint => { window.webkit.messageHandlers.onLikePinpointClicked.postMessage({type: 'likePinpointClicked', data: pinpoint.pinpoint});
                 };
 
                 const attachLikePinpointClick = pinpoint => {
                     const itineraryButton = document.querySelector('.petal_like, .wemap-action-button-like');
                     if (itineraryButton) {
-                        handler = () => onLikePinpointClickedCallback(pinpoint);
-                        itineraryButton.addEventListener('click', handler, {once: true});
+                        handler2 = () => onLikePinpointClickedCallback(pinpoint);
+                        itineraryButton.addEventListener('click', handler2, {once: true});
                     }
                 };
 
                 const detachLikePinpointClick = () => {
                     const itineraryButton = document.querySelector('.petal_like, .wemap-action-button-like');
                     if (itineraryButton) {
-                        itineraryButton.removeEventListener('click', handler);
+                        itineraryButton.removeEventListener('click', handler2);
                     }
                 };
 
