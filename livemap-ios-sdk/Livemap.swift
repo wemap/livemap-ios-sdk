@@ -270,18 +270,9 @@ extension wemapsdk {
                 }
             }
 
-            if (configuration.introcard != nil)
+            if (configuration.introcardActive != nil)
             {
-                if let introcard: String = wemapsdk_config.introcardToUrl(introcard: configuration.introcard) {
-                    // without encoding, URL() becomes nil during creation
-                    urlStr += "&introcard=" + introcard.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-                }
-            }
-
-            if (configuration.urlParameters != nil)
-            {
-                let join1 = configuration.urlParameters!.joined(separator: "&")
-                urlStr += "&" + join1.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+                urlStr += "&introcard=\(configuration.introcardActive)"
             }
         }
 
@@ -709,8 +700,7 @@ public struct WemapLocation: Codable {
 public struct wemapsdk_config {
     public init(
         token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil, maxbounds: BoundingBox? = nil,
-        introcard: IntroCardParameter? = nil,
-        urlParameters: [String]? = nil
+        introcardActive: Bool? = nil
     ) {
         self.token = token ?? ""
         if let mapId = mapId {
@@ -721,18 +711,13 @@ public struct wemapsdk_config {
         }
         self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl
         self.maxbounds = maxbounds ?? nil
-        self.introcard = introcard ?? nil
-        self.urlParameters = urlParameters ?? nil
+        self.introcardActive = introcardActive ?? nil
     }
 
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
 
     public static func boundingBoxFromNSDictionary(dict: NSDictionary) -> BoundingBox? {
         return BoundingBox.map(dict: dict)
-    }
-
-    public static func introcardFromNSDictionary(dict: NSDictionary) -> IntroCardParameter? {
-        return IntroCardParameter.map(dict: dict)
     }
 
     public static func maxBoundsFromUrl(maxbounds: String) -> BoundingBox? {
@@ -758,20 +743,12 @@ public struct wemapsdk_config {
         return MaxBoundsSnippet.toJsonString(parsedStruct: result)
     }
 
-    public static func introcardToUrl(introcard: IntroCardParameter?) -> String? {
-        if (introcard == nil) {
-            return nil
-        }
-        return IntroCardParameter.toJsonString(parsedStruct: introcard!)
-    }
-
     public let token: String
     public let emmid: Int
     public var ufe: Bool = false
     public let livemapRootUrl: String
     public let maxbounds: BoundingBox?
-    public let introcard: IntroCardParameter?
-    public let urlParameters: [String]?
+    public let introcardActive: Bool?
 }
 
 enum WebCommands: String {
