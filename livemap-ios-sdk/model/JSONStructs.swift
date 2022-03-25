@@ -64,3 +64,13 @@ public struct MaxBoundsSnippetCoords: Codable {
     let lng: Double?;
 }
 
+public struct IntroCardParameter: Codable {
+    let active: Bool?;
+
+    /// - Parameters:
+    ///   - active: Bool
+    public init(active: Bool? = nil) {
+        self.active = active
+    }
+}
+
