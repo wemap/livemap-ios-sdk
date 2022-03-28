@@ -20,6 +20,8 @@ import WebKit
     @objc optional func onUserLogin(_ wemapController: wemapsdk)
     @objc optional func onUserLogout(_ wemapController: wemapsdk)
     @objc optional func onUrlChange(_ wemapController: wemapsdk, previousUrl: String, nextUrl: String)
+    @objc optional func onActionButtonClick(_ wemapController: wemapsdk, pinpoint: WemapPinpoint, actionType: String)
+    @objc optional func onActionButtonClick(_ wemapController: wemapsdk, event: WemapEvent, actionType: String)
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -206,6 +208,14 @@ public class wemapsdk: UIView, WKUIDelegate {
         delegate?.onUrlChange?(self, previousUrl: previousUrl, nextUrl: nextUrl)
     }
     
+    func onActionButtonClick(pinpoint: WemapPinpoint, actionType: String) {
+        delegate?.onActionButtonClick?(self, pinpoint: pinpoint, actionType: actionType)
+    }
+    
+    func onActionButtonClick(event: WemapEvent, actionType: String) {
+        delegate?.onActionButtonClick?(self, event: event, actionType: actionType)
+    }
+    
     // Objective C uses a NSDictionary
     func onMapMoved(parsedStruct: MapMoved) {
         if let json = MapMoved.toNSDictionary(parsedStruct: parsedStruct) {
@@ -357,6 +367,21 @@ extension wemapsdk: WKScriptMessageHandler {
             let pinpointData = (json["data"] as? NSDictionary)!
             let pinpoint = WemapPinpoint(pinpointData)
             onGoToPinpointClicked(pinpoint)
+            
+        case .onActionButtonClick:
+            guard let json = message.body as? [String: Any] else { return }
+            let itemType = (json["itemType"] as? String)!
+            let actionType = (json["actionType"] as? String)!
+            switch itemType {
+            case "pinpoint":
+                let pinpoint = WemapPinpoint((json["item"] as? NSDictionary)!)
+                onActionButtonClick(pinpoint: pinpoint, actionType: actionType)
+            case "event":
+                let event = WemapEvent((json["item"] as? NSDictionary)!)
+                onActionButtonClick(event: event, actionType: actionType)
+            default:
+                print("Unknow itemType: \(itemType)")
+            }
 
         case .log:
             debugPrint("Log From webview: \(message.body)")
@@ -438,6 +463,10 @@ extension wemapsdk {
 
                 const onUserLogoutCallback = () => { window.webkit.messageHandlers.onUserLogout.postMessage({type: 'userLogout'});
                 };
+        
+                const onActionButtonClickCallback = (json) => {
+                    window.webkit.messageHandlers.onActionButtonClick.postMessage(json);
+                };
 
                 // AR
                 const onStartCameraCallback = () => { window.webkit.messageHandlers.onStartCamera.postMessage({type: 'cameraStarted'});
@@ -508,6 +537,7 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('livemapMoved', onLivemapMovedCallback);
                 promise = window.livemap.addEventListener('mapClick', onMapClickCallback);
                 promise = window.livemap.addEventListener('mapLongClick', onMapLongClickCallback);
+                promise = window.livemap.addEventListener('actionButtonClick', onActionButtonClickCallback);
 
                 // attach start/stopCamera handler
                 try {
@@ -789,6 +819,7 @@ enum WebCommands: String {
     case log
     case onUserLogin
     case onUserLogout
+    case onActionButtonClick
 
     // RG stuffs
     case onBookEventClicked
@@ -815,5 +846,6 @@ enum WebCommands: String {
                          onUserLogout.rawValue,
                          onLivemapMoved.rawValue,
                          onMapClick.rawValue,
-                         onMapLongClick.rawValue]
+                         onMapLongClick.rawValue,
+                         onActionButtonClick.rawValue]
 }
