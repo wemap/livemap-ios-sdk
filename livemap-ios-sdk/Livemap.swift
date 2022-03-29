@@ -27,9 +27,9 @@ import WebKit
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
     @objc optional func onGoToPinpointClicked(_ wemapController: wemapsdk, pinpoint: WemapPinpoint)
     
-    @objc optional func onMapMoved(_ wemapController: wemapsdk, json: NSDictionary)
-    @objc optional func onMapClick(_ wemapController: wemapsdk, json: NSDictionary)
-    @objc optional func onMapLongClick(_ wemapController: wemapsdk, json: NSDictionary)
+    @objc optional func onMapMoved(_ wemapController: wemapsdk, mapMoved: MapMoved)
+    @objc optional func onMapClick(_ wemapController: wemapsdk, coordinates: Coordinates)
+    @objc optional func onMapLongClick(_ wemapController: wemapsdk, coordinates: Coordinates)
 }
 
 /// Create a Wemap Event
@@ -216,23 +216,16 @@ public class wemapsdk: UIView, WKUIDelegate {
         delegate?.onActionButtonClick?(self, event: event, actionType: actionType)
     }
     
-    // Objective C uses a NSDictionary
-    func onMapMoved(parsedStruct: MapMoved) {
-        if let json = MapMoved.toNSDictionary(parsedStruct: parsedStruct) {
-            delegate?.onMapMoved?(self, json: json)
-        }
+    func onMapMoved(mapMoved: MapMoved) {
+        delegate?.onMapMoved?(self, mapMoved: mapMoved)
     }
     
-    func onMapClick(parsedStruct: Coordinates) {
-        if let json = Coordinates.toNSDictionary(parsedStruct: parsedStruct) {
-            delegate?.onMapClick?(self, json: json)
-        }
+    func onMapClick(coordinates: Coordinates) {
+        delegate?.onMapClick?(self, coordinates: coordinates)
     }
     
-    func onMapLongClick(parsedStruct: Coordinates) {
-        if let json = Coordinates.toNSDictionary(parsedStruct: parsedStruct) {
-            delegate?.onMapLongClick?(self, json: json)
-        }
+    func onMapLongClick(coordinates: Coordinates) {
+        delegate?.onMapLongClick?(self, coordinates: coordinates)
     }
 }
 
@@ -395,25 +388,21 @@ extension wemapsdk: WKScriptMessageHandler {
             onUserLogout()
 
         case .onLivemapMoved:
-            // https://stackoverflow.com/questions/64992931/how-do-i-convert-a-wkscriptmessage-body-to-a-struct
-            if let bodyDict = message.body as? NSDictionary {
-                if let parsedStruct: MapMoved = MapMoved.map(dict: bodyDict) {
-                    onMapMoved(parsedStruct: parsedStruct)
-                }
+            if let json = message.body as? NSDictionary {
+                let mapMoved: MapMoved = MapMoved(zoom: json["zoom"] as? Double, bounds: json["bounds"] as? BoundingBox, latitude: json["latitude"] as? Double, longitude: json["longitude"] as? Double)
+                onMapMoved(mapMoved: mapMoved)
             }
 
         case .onMapClick:
-            if let bodyDict = message.body as? NSDictionary {
-                if let parsedStruct: Coordinates = Coordinates.map(dict: bodyDict) {
-                    onMapClick(parsedStruct: parsedStruct)
-                }
+            if let json = message.body as? NSDictionary {
+                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as? Double, longitude: json["longitude"] as? Double, altitude: json["altitude"] as? Double)
+                onMapClick(coordinates: coordinates)
             }
        
         case .onMapLongClick:
-            if let bodyDict = message.body as? NSDictionary {
-                if let parsedStruct: Coordinates = Coordinates.map(dict: bodyDict) {
-                    onMapLongClick(parsedStruct: parsedStruct)
-                }
+            if let json = message.body as? NSDictionary {
+                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as? Double, longitude: json["longitude"] as? Double, altitude: json["altitude"] as? Double)
+                onMapLongClick(coordinates: coordinates)
             }
 
         default:
@@ -756,10 +745,6 @@ public struct wemapsdk_config {
     }
 
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
-
-    public static func boundingBoxFromNSDictionary(dict: NSDictionary) -> BoundingBox? {
-        return BoundingBox.map(dict: dict)
-    }
 
     public static func introcardFromNSDictionary(dict: NSDictionary) -> IntroCardParameter? {
         return IntroCardParameter.map(dict: dict)

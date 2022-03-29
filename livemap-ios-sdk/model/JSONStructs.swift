@@ -1,8 +1,8 @@
 
-public struct Coordinates: Codable {
-    let latitude: Double?;
-    let longitude: Double?;
-    let altitude: Double?;
+public class Coordinates: NSObject {
+    public let latitude: Double?;
+    public let longitude: Double?;
+    public let altitude: Double?;
 
     /// - Parameters:
     ///   - latitude: Double
@@ -15,27 +15,41 @@ public struct Coordinates: Codable {
         self.longitude = longitude
         self.altitude = altitude
     }
-}
-
-public struct BoundingBox: Codable {
-    let northEast: Coordinates?;
-    let southWest: Coordinates?;
-
-    /// - Parameters:
-    ///   - northEast: Coordinates
-    ///   - southWest: Coordinates
-    public init(northEast: Coordinates? = nil,
-                southWest: Coordinates? = nil) {
-        self.northEast = northEast
-        self.southWest = southWest
+    
+    static func fromJson(_ json: NSDictionary? = nil) -> Coordinates {
+        let latitude = json?["latitude"] as? Double;
+        let longitude = json?["longitude"] as? Double;
+        let altitude = json?["altitude"] as? Double;
+        
+        return Coordinates(latitude: latitude, longitude: longitude, altitude: altitude)
     }
 }
 
-public struct MapMoved: Codable {
-    let zoom: Double?;
-    let bounds: BoundingBox?;
-    let latitude: Double?;
-    let longitude: Double?;
+public class BoundingBox: NSObject {
+    public let northEast: Coordinates?;
+    public let southWest: Coordinates?;
+    
+    /// - Parameters:
+    ///   - northEast: Coordinates
+    ///   - southWest: Coordinates
+    public init(northEast: Coordinates? = nil, southWest: Coordinates? = nil) {
+        self.northEast = northEast!
+        self.southWest = southWest!
+    }
+    
+    static func fromJson(_ json: NSDictionary? = nil) -> BoundingBox {
+        let northEast = Coordinates.fromJson(json?["northEast"] as? NSDictionary);
+        let southWest = Coordinates.fromJson(json?["southWest"] as? NSDictionary);
+        
+        return BoundingBox(northEast: northEast, southWest: southWest)
+    }
+}
+
+public class MapMoved: NSObject {
+    public let zoom: Double?;
+    public let bounds: BoundingBox?;
+    public let latitude: Double?;
+    public let longitude: Double?;
 
     /// - Parameters:
     ///   - zoom: Double
