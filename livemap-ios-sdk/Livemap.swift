@@ -22,6 +22,8 @@ import WebKit
     @objc optional func onUrlChange(_ wemapController: wemapsdk, previousUrl: String, nextUrl: String)
     @objc optional func onActionButtonClick(_ wemapController: wemapsdk, pinpoint: WemapPinpoint, actionType: String)
     @objc optional func onActionButtonClick(_ wemapController: wemapsdk, event: WemapEvent, actionType: String)
+    @objc optional func onContentUpdated(_ wemapController: wemapsdk, events: [WemapEvent], contentUpdatedQuery: ContentUpdatedQuery)
+    @objc optional func onContentUpdated(_ wemapController: wemapsdk, pinpoints: [WemapPinpoint], contentUpdatedQuery: ContentUpdatedQuery)
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -46,7 +48,11 @@ public class WemapEvent: NSObject {
         self.name = json["name"] as! String
         self.eventDescription = json["description"] as! String
         // self.pinpoint = json["point"] as? WemapPinpoint ?? nil // pareil que:
-        self.pinpoint = WemapPinpoint(json["point"] as! NSDictionary)
+        if let jsonPinpoint = json["point"] as? NSDictionary {
+            self.pinpoint = WemapPinpoint(jsonPinpoint)
+        } else {
+            self.pinpoint = nil
+        }
         if let external_data = json["external_data"] {
             self.external_data = external_data as? NSDictionary
         } else {
@@ -227,6 +233,14 @@ public class wemapsdk: UIView, WKUIDelegate {
     func onMapLongClick(coordinates: Coordinates) {
         delegate?.onMapLongClick?(self, coordinates: coordinates)
     }
+    
+    func onContentUpdated(pinpoints: [WemapPinpoint], contentUpdatedQuery: ContentUpdatedQuery) {
+        delegate?.onContentUpdated?(self, pinpoints: pinpoints, contentUpdatedQuery: contentUpdatedQuery)
+    }
+    
+    func onContentUpdated(events: [WemapEvent], contentUpdatedQuery: ContentUpdatedQuery) {
+        delegate?.onContentUpdated?(self, events: events, contentUpdatedQuery: contentUpdatedQuery)
+    }
 }
 
 extension wemapsdk: WKNavigationDelegate {
@@ -404,6 +418,29 @@ extension wemapsdk: WKScriptMessageHandler {
                 let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as? Double, longitude: json["longitude"] as? Double, altitude: json["altitude"] as? Double)
                 onMapLongClick(coordinates: coordinates)
             }
+            
+        case .onContentUpdated:
+            if let json = message.body as? NSDictionary {
+                let type = json["type"] as! String
+                let contentUpdatedQuery = ContentUpdatedQuery(
+                    query: json["query"] as? String,
+                    tags: json["tags"] as? [String],
+                    bounds: BoundingBox.fromJson(json["bounds"] as? NSDictionary),
+                    minAltitude: json["minAltitude"] as? Int,
+                    maxAltitude: json["maxAltitude"] as? Int
+                )
+                
+                switch type {
+                case "pinpoints":
+                    let pinpoints = (json["items"] as! [NSDictionary]).map { WemapPinpoint($0) }
+                    onContentUpdated(pinpoints: pinpoints, contentUpdatedQuery: contentUpdatedQuery)
+                case "events":
+                    let events = (json["items"] as! [NSDictionary]).map { WemapEvent($0) }
+                    onContentUpdated(events: events, contentUpdatedQuery: contentUpdatedQuery)
+                default:
+                        print("Unknow itemType: \(type)")
+                }
+            }
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -455,6 +492,10 @@ extension wemapsdk {
         
                 const onActionButtonClickCallback = (json) => {
                     window.webkit.messageHandlers.onActionButtonClick.postMessage(json);
+                };
+        
+                const onContentUpdatedCallback = (json) => {
+                    window.webkit.messageHandlers.onContentUpdated.postMessage(json);
                 };
 
                 // AR
@@ -527,6 +568,7 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('mapClick', onMapClickCallback);
                 promise = window.livemap.addEventListener('mapLongClick', onMapLongClickCallback);
                 promise = window.livemap.addEventListener('actionButtonClick', onActionButtonClickCallback);
+                promise = window.livemap.addEventListener('contentUpdated', onContentUpdatedCallback);
 
                 // attach start/stopCamera handler
                 try {
@@ -805,6 +847,7 @@ enum WebCommands: String {
     case onUserLogin
     case onUserLogout
     case onActionButtonClick
+    case onContentUpdated
 
     // RG stuffs
     case onBookEventClicked
@@ -832,5 +875,6 @@ enum WebCommands: String {
                          onLivemapMoved.rawValue,
                          onMapClick.rawValue,
                          onMapLongClick.rawValue,
-                         onActionButtonClick.rawValue]
+                         onActionButtonClick.rawValue,
+                         onContentUpdated.rawValue]
 }

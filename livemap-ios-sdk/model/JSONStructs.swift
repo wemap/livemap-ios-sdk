@@ -67,7 +67,26 @@ public class MapMoved: NSObject {
     }
 }
 
-// from snippet.config.json
+public class ContentUpdatedQuery: NSObject {
+    public let query: String?;
+    public let tags: [String]?;
+    public let bounds: BoundingBox?;
+    public let minAltitude: Int?;
+    public let maxAltitude: Int?;
+    
+    init(query: String? = nil,
+         tags: [String]? = nil,
+         bounds: BoundingBox? = nil,
+         minAltitude: Int? = nil,
+         maxAltitude: Int? = nil) {
+        self.query = query
+        self.tags = tags
+        self.bounds = bounds
+        self.minAltitude = minAltitude
+        self.maxAltitude = maxAltitude
+    }
+}
+
 public struct MaxBoundsSnippet: Codable {
     let _northEast: MaxBoundsSnippetCoords?;
     let _southWest: MaxBoundsSnippetCoords?;
