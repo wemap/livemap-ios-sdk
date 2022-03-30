@@ -1,5 +1,23 @@
+public class JSON: NSObject {
+    internal func toDictionary() -> [String?: Any] {
+        let mirror = Mirror(reflecting: self);
+        return Dictionary(uniqueKeysWithValues: mirror.children.map { ($0.label, $0.value) })
+    }
+    
+    internal func toJson() -> Data? {
+        do {
+            return try JSONSerialization.data(withJSONObject: self.toDictionary(), options: [])
+        } catch {
+            return nil
+        }
+    }
 
-public class Coordinates: NSObject {
+    public func toJsonString() -> String {
+        return String(data: self.toJson()!, encoding: String.Encoding.ascii) ?? "undefined"
+    }
+}
+
+public class Coordinates: JSON {
     public let latitude: Double?;
     public let longitude: Double?;
     public let altitude: Double?;
@@ -25,7 +43,7 @@ public class Coordinates: NSObject {
     }
 }
 
-public class BoundingBox: NSObject {
+public class BoundingBox: JSON {
     public let northEast: Coordinates?;
     public let southWest: Coordinates?;
     
@@ -45,7 +63,7 @@ public class BoundingBox: NSObject {
     }
 }
 
-public class MapMoved: NSObject {
+public class MapMoved: JSON {
     public let zoom: Double?;
     public let bounds: BoundingBox?;
     public let latitude: Double?;
@@ -67,7 +85,7 @@ public class MapMoved: NSObject {
     }
 }
 
-public class ContentUpdatedQuery: NSObject {
+public class ContentUpdatedQuery: JSON {
     public let query: String?;
     public let tags: [String]?;
     public let bounds: BoundingBox?;
@@ -107,3 +125,19 @@ public struct IntroCardParameter: Codable {
     }
 }
 
+public class PolylineOptions: JSON {
+    public let color: String?;
+    public let opacity: Float?;
+    public let width: Float?;
+    public let useNetwork: Bool?;
+    
+    init(color: String? = "2F7DE1",
+         opacity: Float = 0.8,
+         width: Float = 4,
+         useNetwork: Bool = false) {
+        self.color = color
+        self.opacity = opacity
+        self.width = width
+        self.useNetwork = useNetwork
+    }
+}

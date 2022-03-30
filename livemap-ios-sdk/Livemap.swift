@@ -24,6 +24,7 @@ import WebKit
     @objc optional func onActionButtonClick(_ wemapController: wemapsdk, event: WemapEvent, actionType: String)
     @objc optional func onContentUpdated(_ wemapController: wemapsdk, events: [WemapEvent], contentUpdatedQuery: ContentUpdatedQuery)
     @objc optional func onContentUpdated(_ wemapController: wemapsdk, pinpoints: [WemapPinpoint], contentUpdatedQuery: ContentUpdatedQuery)
+    @objc optional func onPolylineDrawn(_ wemapController: wemapsdk, id: String)
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -241,6 +242,10 @@ public class wemapsdk: UIView, WKUIDelegate {
     func onContentUpdated(events: [WemapEvent], contentUpdatedQuery: ContentUpdatedQuery) {
         delegate?.onContentUpdated?(self, events: events, contentUpdatedQuery: contentUpdatedQuery)
     }
+    
+    func onPolylineDrawn(id: String) {
+        delegate?.onPolylineDrawn?(self, id: id)
+    }
 }
 
 extension wemapsdk: WKNavigationDelegate {
@@ -440,6 +445,11 @@ extension wemapsdk: WKScriptMessageHandler {
                 default:
                         print("Unknow itemType: \(type)")
                 }
+            }
+            
+        case .onPolylineDrawn:
+            if let id = message.body as? String {
+                onPolylineDrawn(id: id)
             }
 
         default:
@@ -726,6 +736,21 @@ extension wemapsdk {
         let script = "promise = window.livemap.enableAnalytics();"
         webView.evaluateJavaScript(script)
     }
+    
+    public func drawPolyline(coordinatesList: [Coordinates], options: PolylineOptions? = nil) {
+        let coordinatesListString = "[ \(coordinatesList.map({ $0.toJsonString() }).joined(separator: ",")) ]"
+        let script = """
+        promise = window.livemap
+                    .drawPolyline(\(coordinatesListString), \(options?.toJsonString() ?? "undefined"))
+                    .then(({id}) => { window.webkit.messageHandlers.onPolylineDrawn.postMessage(id) });
+        """
+        webView.evaluateJavaScript(script)
+    }
+    
+    public func removePolyline(id: String) {
+        let script = "promise = window.livemap.removePolyline('\(id)');"
+        webView.evaluateJavaScript(script)
+    }
 }
 
 /// Create a map filter
@@ -848,6 +873,7 @@ enum WebCommands: String {
     case onUserLogout
     case onActionButtonClick
     case onContentUpdated
+    case onPolylineDrawn
 
     // RG stuffs
     case onBookEventClicked
@@ -876,5 +902,6 @@ enum WebCommands: String {
                          onMapClick.rawValue,
                          onMapLongClick.rawValue,
                          onActionButtonClick.rawValue,
-                         onContentUpdated.rawValue]
+                         onContentUpdated.rawValue,
+                         onPolylineDrawn.rawValue]
 }
