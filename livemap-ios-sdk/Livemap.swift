@@ -417,14 +417,8 @@ extension wemapsdk: WKScriptMessageHandler {
         case .onContentUpdated:
             if let json = message.body as? NSDictionary {
                 let type = json["type"] as! String
-                let contentUpdatedQuery = ContentUpdatedQuery(
-                    query: json["query"] as? String,
-                    tags: json["tags"] as? [String],
-                    bounds: BoundingBox.fromJson(json["bounds"] as? NSDictionary),
-                    minAltitude: json["minAltitude"] as? Int,
-                    maxAltitude: json["maxAltitude"] as? Int
-                )
-                
+                let contentUpdatedQuery = ContentUpdatedQuery.fromJson(json["query"] as! NSDictionary)
+
                 switch type {
                 case "pinpoints":
                     let pinpoints = (json["items"] as! [NSDictionary]).map { WemapPinpoint($0) }
@@ -433,7 +427,7 @@ extension wemapsdk: WKScriptMessageHandler {
                     let events = (json["items"] as! [NSDictionary]).map { WemapEvent($0) }
                     onContentUpdated(events: events, contentUpdatedQuery: contentUpdatedQuery)
                 default:
-                        print("Unknow itemType: \(type)")
+                    print("Unknow itemType: \(type)")
                 }
             }
             

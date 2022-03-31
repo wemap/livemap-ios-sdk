@@ -103,6 +103,22 @@ public class ContentUpdatedQuery: JSON {
         self.minAltitude = minAltitude
         self.maxAltitude = maxAltitude
     }
+    
+    public static func fromJson(_ json: NSDictionary) -> ContentUpdatedQuery {
+        let query = json["query"] as? String
+        let tags = json["tags"] as? [String]
+        let bounds = BoundingBox.fromJson(json["bounds"] as! NSDictionary);
+        let minAltitude = json["minAltitude"] as? Int;
+        let maxAltitude = json["maxAltitude"] as? Int;
+        
+        return ContentUpdatedQuery(
+            query: query,
+            tags: tags,
+            bounds: bounds,
+            minAltitude: minAltitude,
+            maxAltitude: maxAltitude
+        )
+    }
 }
 
 public class IntroCardParameter: JSON {
