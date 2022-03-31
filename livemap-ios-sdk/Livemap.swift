@@ -284,26 +284,16 @@ extension wemapsdk {
         } else {
             urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&clicktofullscreen=false"
 
-            if (configuration.maxbounds != nil)
-            {
-                if let box: String = wemapsdk_config.maxBoundsToUrl(maxbounds: configuration.maxbounds) {
-                    // without encoding, URL() becomes nil during creation
-                    urlStr += "&maxbounds=" + box.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-                }
+            if let maxBoundsString: String = configuration.maxbounds?.toJsonString() {
+                urlStr += "&maxbounds=" + maxBoundsString.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
             }
 
-            if (configuration.introcard != nil)
-            {
-                if let introcard: String = wemapsdk_config.introcardToUrl(introcard: configuration.introcard) {
-                    // without encoding, URL() becomes nil during creation
-                    urlStr += "&introcard=" + introcard.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-                }
+            if let introcardString: String = configuration.introcard?.toJsonString() {
+                urlStr += "&introcard=" + introcardString.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
             }
 
-            if (configuration.urlParameters != nil)
-            {
-                let join1 = configuration.urlParameters!.joined(separator: "&")
-                urlStr += "&" + join1.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+            if let urlParametersString: String = configuration.urlParameters?.joined(separator: "&") {
+                urlStr += "&" + urlParametersString.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
             }
         }
 
@@ -414,13 +404,13 @@ extension wemapsdk: WKScriptMessageHandler {
 
         case .onMapClick:
             if let json = message.body as? NSDictionary {
-                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as? Double, longitude: json["longitude"] as? Double, altitude: json["altitude"] as? Double)
+                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as! Double, longitude: json["longitude"] as! Double, altitude: json["altitude"] as? Double)
                 onMapClick(coordinates: coordinates)
             }
        
         case .onMapLongClick:
             if let json = message.body as? NSDictionary {
-                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as? Double, longitude: json["longitude"] as? Double, altitude: json["altitude"] as? Double)
+                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as! Double, longitude: json["longitude"] as! Double, altitude: json["altitude"] as? Double)
                 onMapLongClick(coordinates: coordinates)
             }
             
@@ -812,41 +802,6 @@ public struct wemapsdk_config {
     }
 
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
-
-    public static func introcardFromNSDictionary(dict: NSDictionary) -> IntroCardParameter? {
-        return IntroCardParameter.map(dict: dict)
-    }
-
-    public static func maxBoundsFromUrl(maxbounds: String) -> BoundingBox? {
-        if let parsedStruct: MaxBoundsSnippet = MaxBoundsSnippet.map(string: maxbounds) {
-            let result: BoundingBox = BoundingBox(
-                northEast: Coordinates(latitude: parsedStruct._northEast?.lat, longitude: parsedStruct._northEast?.lng, altitude: nil),
-                southWest: Coordinates(latitude: parsedStruct._southWest?.lat, longitude: parsedStruct._southWest?.lng, altitude: nil)
-            )
-            return result
-        }
-        return nil
-    }
-
-    public static func maxBoundsToUrl(maxbounds: BoundingBox?) -> String? {
-        if (maxbounds == nil) {
-            return nil
-        }
-        let maxbounds2: BoundingBox = maxbounds!
-        let result: MaxBoundsSnippet = MaxBoundsSnippet(
-            _northEast: MaxBoundsSnippetCoords(lat: maxbounds2.northEast?.latitude, lng: maxbounds2.northEast?.longitude),
-            _southWest: MaxBoundsSnippetCoords(lat: maxbounds2.southWest?.latitude, lng: maxbounds2.southWest?.longitude)
-        )
-        return MaxBoundsSnippet.toJsonString(parsedStruct: result)
-    }
-
-    public static func introcardToUrl(introcard: IntroCardParameter?) -> String? {
-        if (introcard == nil) {
-            return nil
-        }
-        return IntroCardParameter.toJsonString(parsedStruct: introcard!)
-    }
-
     public let token: String
     public let emmid: Int
     public var ufe: Bool = false

@@ -18,46 +18,46 @@ public class JSON: NSObject {
 }
 
 public class Coordinates: JSON {
-    public let latitude: Double?;
-    public let longitude: Double?;
+    public let latitude: Double;
+    public let longitude: Double;
     public let altitude: Double?;
 
     /// - Parameters:
     ///   - latitude: Double
     ///   - longitude: Double
     ///   - altitude: Double
-    public init(latitude: Double? = nil,
-                longitude: Double? = nil,
+    public init(latitude: Double,
+                longitude: Double,
                 altitude: Double? = nil) {
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
     }
     
-    static func fromJson(_ json: NSDictionary? = nil) -> Coordinates {
-        let latitude = json?["latitude"] as? Double;
-        let longitude = json?["longitude"] as? Double;
-        let altitude = json?["altitude"] as? Double;
+    public static func fromJson(_ json: NSDictionary) -> Coordinates {
+        let latitude = json["latitude"] as! Double;
+        let longitude = json["longitude"] as! Double;
+        let altitude = json["altitude"] as? Double;
         
         return Coordinates(latitude: latitude, longitude: longitude, altitude: altitude)
     }
 }
 
 public class BoundingBox: JSON {
-    public let northEast: Coordinates?;
-    public let southWest: Coordinates?;
+    public let northEast: Coordinates;
+    public let southWest: Coordinates;
     
     /// - Parameters:
     ///   - northEast: Coordinates
     ///   - southWest: Coordinates
-    public init(northEast: Coordinates? = nil, southWest: Coordinates? = nil) {
-        self.northEast = northEast!
-        self.southWest = southWest!
+    public init(northEast: Coordinates, southWest: Coordinates) {
+        self.northEast = northEast
+        self.southWest = southWest
     }
     
-    static func fromJson(_ json: NSDictionary? = nil) -> BoundingBox {
-        let northEast = Coordinates.fromJson(json?["northEast"] as? NSDictionary);
-        let southWest = Coordinates.fromJson(json?["southWest"] as? NSDictionary);
+    public static func fromJson(_ json: NSDictionary) -> BoundingBox {
+        let northEast = Coordinates.fromJson(json["northEast"] as! NSDictionary);
+        let southWest = Coordinates.fromJson(json["southWest"] as! NSDictionary);
         
         return BoundingBox(northEast: northEast, southWest: southWest)
     }
@@ -105,17 +105,7 @@ public class ContentUpdatedQuery: JSON {
     }
 }
 
-public struct MaxBoundsSnippet: Codable {
-    let _northEast: MaxBoundsSnippetCoords?;
-    let _southWest: MaxBoundsSnippetCoords?;
-}
-
-public struct MaxBoundsSnippetCoords: Codable {
-    let lat: Double?;
-    let lng: Double?;
-}
-
-public struct IntroCardParameter: Codable {
+public class IntroCardParameter: JSON {
     let active: Bool?;
 
     /// - Parameters:
