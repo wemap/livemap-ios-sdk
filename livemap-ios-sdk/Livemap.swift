@@ -35,80 +35,13 @@ import WebKit
     @objc optional func onMapLongClick(_ wemapController: wemapsdk, coordinates: Coordinates)
 }
 
-/// Create a Wemap Event
-public class WemapEvent: NSObject {
-    public let id:Int
-    public let name: String;
-    public let eventDescription: String;
-    public let pinpoint: WemapPinpoint?;
-    public let external_data: NSDictionary?
-
-    /// - Parameter json: { id, name, description, external_data }
-    public init(_ json: NSDictionary) {
-        self.id = json["id"] as! Int
-        self.name = json["name"] as! String
-        self.eventDescription = json["description"] as! String
-        // self.pinpoint = json["point"] as? WemapPinpoint ?? nil // pareil que:
-        if let jsonPinpoint = json["point"] as? NSDictionary {
-            self.pinpoint = WemapPinpoint(jsonPinpoint)
-        } else {
-            self.pinpoint = nil
-        }
-        if let external_data = json["external_data"] {
-            self.external_data = external_data as? NSDictionary
-        } else {
-            self.external_data = nil
-        }
-    }
-}
-
-/// Create a Wemap Pinpoint
-public class WemapPinpoint: NSObject {
-    public let data:NSDictionary
-    public let id:Int
-    public let longitude: Double
-    public let latitude: Double
-    public let name: String
-    public let pinpointDescription: String
-    public let external_data: NSDictionary?
-    // public var type: Int
-    // public var category: Int
-
-    /// - Parameter json: { id, longitude, latitude, name, description, external_data }
-    public init(_ json: NSDictionary) {
-        self.data = json
-        self.id = json["id"] as! Int
-        self.longitude = json["longitude"] as! Double
-        self.latitude = json["latitude"] as! Double
-        self.name = json["name"] as! String
-        self.pinpointDescription = json["description"] as! String
-        if let external_data = json["external_data"] {
-            self.external_data = external_data as? NSDictionary
-        } else {
-            self.external_data = nil
-        }
-    }
-    
-    public func toJson() -> Data? {
-        do {
-            return try JSONSerialization.data(withJSONObject: self.data, options: [])
-        } catch {
-            return nil
-        }
-    }
-
-    public func toJsonString() -> String {
-        return String(data: self.toJson()!, encoding: String.Encoding.ascii)!
-    }
-}
-
 public class wemapsdk: UIView, WKUIDelegate {
     public static let sharedInstance = wemapsdk(frame: CGRect.zero)
 
     private var configuration: wemapsdk_config!
     private var webView: WKWebView!
     private var arView: CustomARView!
-    private var currentUrl: String = ""
+    public var currentUrl: String = ""
 
     private lazy var mapViewConfig: WKWebViewConfiguration = {
         let contentController = WKUserContentController()
@@ -278,31 +211,40 @@ extension wemapsdk {
     }
 
     public func loadMapUrl() {
-        var urlStr = configuration.livemapRootUrl + "/dom.html?"
+        var urlComps = URLComponents(string: configuration.livemapRootUrl)!
+        var queryItems: [URLQueryItem] = []
+        
         if (configuration.ufe) {
-            urlStr += "dist=ufe&arviewenabled=true&routingtype=osrm&routingmode=walking&routingurl=https://routingdev.maaap.it&homecontrol=false&clicktofullscreen=false"
+            queryItems.append(URLQueryItem(name: "dist", value: "ufe"))
+            queryItems.append(URLQueryItem(name: "arviewenabled", value: "true"))
+            queryItems.append(URLQueryItem(name: "routingtype", value: "osrm"))
+            queryItems.append(URLQueryItem(name: "routingmode", value: "walking"))
+            queryItems.append(URLQueryItem(name: "routingurl", value: "https://routingdev.maaap.it"))
+            queryItems.append(URLQueryItem(name: "homecontrol", value: "false"))
+            queryItems.append(URLQueryItem(name: "clicktofullscreen", value: "false"))
         } else {
-            urlStr += "token=\(configuration.token)&emmid=\(configuration.emmid)&clicktofullscreen=false"
+            queryItems.append(URLQueryItem(name: "token", value: configuration.token))
+            queryItems.append(URLQueryItem(name: "emmid", value: "\(configuration.emmid)"))
+            queryItems.append(URLQueryItem(name: "clicktofullscreen", value: "false"))
 
             if let maxBoundsString: String = configuration.maxbounds?.toJsonString() {
-                urlStr += "&maxbounds=" + maxBoundsString.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+                queryItems.append(URLQueryItem(name: "maxbounds", value: "'\(maxBoundsString)'"))
             }
 
             if let introcardString: String = configuration.introcard?.toJsonString() {
-                urlStr += "&introcard=" + introcardString.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
-            }
-
-            if let urlParametersString: String = configuration.urlParameters?.joined(separator: "&") {
-                urlStr += "&" + urlParametersString.addingPercentEncoding(withAllowedCharacters: .urlHostAllowed)!
+                queryItems.append(URLQueryItem(name: "introcard", value: "'\(introcardString)'"))
             }
         }
+        
+        urlComps.queryItems = queryItems
+        let url = urlComps.url!
 
         webView.load(
-            URLRequest(url: URL(string: urlStr)!, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
+            URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
         )
 
         if (self.currentUrl == "") {
-            self.currentUrl = urlStr;
+            self.currentUrl = url.absoluteString;
         }
     }
 }
@@ -398,26 +340,24 @@ extension wemapsdk: WKScriptMessageHandler {
 
         case .onLivemapMoved:
             if let json = message.body as? NSDictionary {
-                let mapMoved: MapMoved = MapMoved(zoom: json["zoom"] as? Double, bounds: json["bounds"] as? BoundingBox, latitude: json["latitude"] as? Double, longitude: json["longitude"] as? Double)
-                onMapMoved(mapMoved: mapMoved)
+                onMapMoved(mapMoved: MapMoved.fromDictionary(json))
             }
 
         case .onMapClick:
             if let json = message.body as? NSDictionary {
-                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as! Double, longitude: json["longitude"] as! Double, altitude: json["altitude"] as? Double)
-                onMapClick(coordinates: coordinates)
+                onMapClick(coordinates: Coordinates.fromDictionary(json))
             }
        
         case .onMapLongClick:
+            print("ngkfgmkgfmgpgp2")
             if let json = message.body as? NSDictionary {
-                let coordinates: Coordinates = Coordinates(latitude: json["latitude"] as! Double, longitude: json["longitude"] as! Double, altitude: json["altitude"] as? Double)
-                onMapLongClick(coordinates: coordinates)
+                onMapLongClick(coordinates: Coordinates.fromDictionary(json))
             }
             
         case .onContentUpdated:
             if let json = message.body as? NSDictionary {
                 let type = json["type"] as! String
-                let contentUpdatedQuery = ContentUpdatedQuery.fromJson(json["query"] as! NSDictionary)
+                let contentUpdatedQuery = ContentUpdatedQuery.fromDictionary(json["query"] as! NSDictionary)
 
                 switch type {
                 case "pinpoints":
@@ -789,7 +729,7 @@ public struct wemapsdk_config {
             self.emmid = -1
             self.ufe = true
         }
-        self.livemapRootUrl = livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl
+        self.livemapRootUrl = (livemapRootUrl ?? wemapsdk_config.defaultLivemapRootUrl) + "/dom.html"
         self.maxbounds = maxbounds ?? nil
         self.introcard = introcard ?? nil
         self.urlParameters = urlParameters ?? nil

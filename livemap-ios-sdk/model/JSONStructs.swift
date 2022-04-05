@@ -1,19 +1,19 @@
+import Foundation
 public class JSON: NSObject {
-    internal func toDictionary() -> [String?: Any] {
-        let mirror = Mirror(reflecting: self);
-        return Dictionary(uniqueKeysWithValues: mirror.children.map { ($0.label, $0.value) })
+    public func toDictionary() -> [String: Any] {
+        return [String: Any]()
     }
     
-    internal func toJson() -> Data? {
+    internal func toJson() -> Data {
         do {
             return try JSONSerialization.data(withJSONObject: self.toDictionary(), options: [])
         } catch {
-            return nil
+            return Data()
         }
     }
 
     public func toJsonString() -> String {
-        return String(data: self.toJson()!, encoding: String.Encoding.ascii) ?? "undefined"
+        return String(data: self.toJson(), encoding: String.Encoding.ascii) ?? ""
     }
 }
 
@@ -28,18 +28,26 @@ public class Coordinates: JSON {
     ///   - altitude: Double
     public init(latitude: Double,
                 longitude: Double,
-                altitude: Double? = nil) {
+                altitude: Double?) {
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
     }
     
-    public static func fromJson(_ json: NSDictionary) -> Coordinates {
-        let latitude = json["latitude"] as! Double;
-        let longitude = json["longitude"] as! Double;
-        let altitude = json["altitude"] as? Double;
+    public static func fromDictionary(_ dict: NSDictionary) -> Coordinates {
+        let latitude = dict["latitude"] as! Double;
+        let longitude = dict["longitude"] as! Double;
+        let altitude = dict["altitude"] as? Double;
         
         return Coordinates(latitude: latitude, longitude: longitude, altitude: altitude)
+    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "altitude": self.altitude as Any
+        ]
     }
 }
 
@@ -55,11 +63,18 @@ public class BoundingBox: JSON {
         self.southWest = southWest
     }
     
-    public static func fromJson(_ json: NSDictionary) -> BoundingBox {
-        let northEast = Coordinates.fromJson(json["northEast"] as! NSDictionary);
-        let southWest = Coordinates.fromJson(json["southWest"] as! NSDictionary);
+    public static func fromDictionary(_ dict: NSDictionary) -> BoundingBox {
+        let northEast = Coordinates.fromDictionary(dict["northEast"] as! NSDictionary);
+        let southWest = Coordinates.fromDictionary(dict["southWest"] as! NSDictionary);
         
         return BoundingBox(northEast: northEast, southWest: southWest)
+    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "northEast": self.northEast.toDictionary(),
+            "southWest": self.southWest.toDictionary(),
+        ]
     }
 }
 
@@ -83,6 +98,29 @@ public class MapMoved: JSON {
         self.latitude = latitude
         self.longitude = longitude
     }
+    
+    public static func fromDictionary(_ dict: NSDictionary) -> MapMoved {
+        let zoom = dict["zoom"] as? Double;
+        let bounds = BoundingBox.fromDictionary(dict["bounds"] as! NSDictionary);
+        let latitude = dict["latitude"] as? Double;
+        let longitude = dict["longitude"] as? Double;
+        
+        return MapMoved(
+            zoom: zoom,
+            bounds: bounds,
+            latitude: latitude,
+            longitude: longitude
+        )
+    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "zoom": self.zoom as Any,
+            "bounds": (self.bounds?.toDictionary()) as Any,
+            "latitude": self.latitude as Any,
+            "longitude": self.longitude as Any,
+        ]
+    }
 }
 
 public class ContentUpdatedQuery: JSON {
@@ -104,12 +142,12 @@ public class ContentUpdatedQuery: JSON {
         self.maxAltitude = maxAltitude
     }
     
-    public static func fromJson(_ json: NSDictionary) -> ContentUpdatedQuery {
-        let query = json["query"] as? String
-        let tags = json["tags"] as? [String]
-        let bounds = BoundingBox.fromJson(json["bounds"] as! NSDictionary);
-        let minAltitude = json["minAltitude"] as? Int;
-        let maxAltitude = json["maxAltitude"] as? Int;
+    public static func fromDictionary(_ dict: NSDictionary) -> ContentUpdatedQuery {
+        let query = dict["query"] as? String;
+        let tags = dict["tags"] as? [String];
+        let bounds = BoundingBox.fromDictionary(dict["bounds"] as! NSDictionary);
+        let minAltitude = dict["minAltitude"] as? Int;
+        let maxAltitude = dict["maxAltitude"] as? Int;
         
         return ContentUpdatedQuery(
             query: query,
@@ -118,6 +156,16 @@ public class ContentUpdatedQuery: JSON {
             minAltitude: minAltitude,
             maxAltitude: maxAltitude
         )
+    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "query": self.query as Any,
+            "tags": self.tags as Any,
+            "bounds": (self.bounds?.toDictionary()) as Any,
+            "minAltitude": self.minAltitude as Any,
+            "maxAltitude": self.maxAltitude as Any
+        ]
     }
 }
 
@@ -129,6 +177,18 @@ public class IntroCardParameter: JSON {
     public init(active: Bool? = nil) {
         self.active = active
     }
+    
+    public static func fromDictionary(_ dict: NSDictionary) -> IntroCardParameter {
+        let active = dict["active"] as? Bool
+        
+        return IntroCardParameter(active: active)
+    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "active": self.active as Any
+        ]
+    }
 }
 
 public class PolylineOptions: JSON {
@@ -138,12 +198,144 @@ public class PolylineOptions: JSON {
     public let useNetwork: Bool?;
     
     init(color: String? = "2F7DE1",
-         opacity: Float = 0.8,
-         width: Float = 4,
-         useNetwork: Bool = false) {
+         opacity: Float? = 0.8,
+         width: Float? = 4,
+         useNetwork: Bool? = false) {
         self.color = color
         self.opacity = opacity
         self.width = width
         self.useNetwork = useNetwork
+    }
+    
+    public static func fromDictionary(_ dict: NSDictionary) -> PolylineOptions {
+        let color = dict["color"] as? String
+        let opacity = dict["opacity"] as? Float;
+        let width = dict["width"] as? Float;
+        let useNetwork = dict["useNetwork"] as? Bool;
+        
+        return PolylineOptions(
+            color: color,
+            opacity: opacity,
+            width: width,
+            useNetwork: useNetwork
+        )
+    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "color": self.color as Any,
+            "opacity": self.opacity as Any,
+            "width": self.width as Any,
+            "useNetwork": self.useNetwork as Any
+        ]
+    }
+}
+
+/// Create a Wemap Pinpoint
+public class WemapPinpoint: JSON {
+    public let data: NSDictionary;
+    public let id: Int;
+    public let longitude: Double;
+    public let latitude: Double;
+    public let name: String;
+    public let pinpointDescription: String
+    public let external_data: NSDictionary?;
+
+    /// - Parameter json: { id, longitude, latitude, name, description, external_data }
+    public init(_ json: NSDictionary) {
+        self.data = json
+        self.id = json["id"] as! Int
+        self.longitude = json["longitude"] as! Double
+        self.latitude = json["latitude"] as! Double
+        self.name = json["name"] as! String
+        self.pinpointDescription = json["description"] as! String
+        if let external_data = json["external_data"] {
+            self.external_data = external_data as? NSDictionary
+        } else {
+            self.external_data = nil
+        }
+    }
+    
+    // TODO: init it without dictionary and uncomment this method
+//    public static func fromDictionary(_ dict: NSDictionary) -> WemapPinpoint {
+//        let id = dict["id"] as! Int
+//        let longitude = dict["longitude"] as! Double;
+//        let latitude = dict["latitude"] as! Float;
+//        let name = dict["name"] as! String;
+//        let description = dict["description"] as! String;
+//        let external_data = dict["external_data"] as? NSDictionary;
+//
+//        return WemapPinpoint(
+//            id: id,
+//            longitude: longitude,
+//            latitude: latitude,
+//            name: name,
+//            description: description,
+//            external_data: external_data
+//        )
+//    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "id": self.id,
+            "longitude": self.longitude,
+            "latitude": self.latitude,
+            "name": self.name,
+            "description": self.pinpointDescription,
+            "external_data": self.external_data as Any,
+        ]
+    }
+}
+
+/// Create a Wemap Event
+public class WemapEvent: JSON {
+    public let id: Int;
+    public let name: String;
+    public let eventDescription: String;
+    public let pinpoint: WemapPinpoint?;
+    public let external_data: NSDictionary?
+
+    /// - Parameter json: { id, name, description, external_data }
+    public init(_ json: NSDictionary) {
+        self.id = json["id"] as! Int
+        self.name = json["name"] as! String
+        self.eventDescription = json["description"] as! String
+        if let jsonPinpoint = json["point"] as? NSDictionary {
+            self.pinpoint = WemapPinpoint(jsonPinpoint)
+        } else {
+            self.pinpoint = nil
+        }
+        if let external_data = json["external_data"] {
+            self.external_data = external_data as? NSDictionary
+        } else {
+            self.external_data = nil
+        }
+    }
+  
+    // TODO: init it without dictionary and uncomment this method
+//    public static func fromDictionary(_ dict: NSDictionary) -> PolylineOptions {
+//        let id = dict["id"] as! Int
+//        let name = dict["name"] as? String;
+//        let description = dict["description"] as! String;
+//        let pinpoint = WemapPinpoint(dict["pinpoint"] as! NSDictionary);
+//        let external_data = dict["NSDictionary"] as? NSDictionary;
+//
+//        return WemapEvent(
+//            id: id,
+//            name: name,
+//            description: description,
+//            pinpoint: pinpoint,
+//            external_data: external_data
+//        )
+//    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "id": self.id,
+            "name": self.name,
+            "description": self.eventDescription,
+            "pinpoint": self.pinpoint?.toDictionary() as Any,
+            "external_data": self.external_data as Any
+        ]
     }
 }
