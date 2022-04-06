@@ -76,6 +76,26 @@ public class BoundingBox: JSON {
             "southWest": self.southWest.toDictionary(),
         ]
     }
+    
+    public func toUrlParameter () -> String {
+        do {
+            let dict = [
+                "_northEast": [
+                    "lat": self.northEast.latitude,
+                    "lng": self.northEast.longitude
+                ],
+                "_southWest": [
+                    "lat": self.southWest.latitude,
+                    "lng": self.southWest.longitude
+                ],
+            ]
+            let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
+            
+            return String(data: jsonData, encoding: String.Encoding.ascii) ?? ""
+        } catch {
+            return ""
+        }
+    }
 }
 
 public class MapMoved: JSON {

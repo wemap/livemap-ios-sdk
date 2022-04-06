@@ -227,12 +227,12 @@ extension wemapsdk {
             queryItems.append(URLQueryItem(name: "emmid", value: "\(configuration.emmid)"))
             queryItems.append(URLQueryItem(name: "clicktofullscreen", value: "false"))
 
-            if let maxBoundsString: String = configuration.maxbounds?.toJsonString() {
-                queryItems.append(URLQueryItem(name: "maxbounds", value: "'\(maxBoundsString)'"))
+            if let maxBoundsString: String = configuration.maxbounds?.toUrlParameter() {
+                queryItems.append(URLQueryItem(name: "maxbounds", value: maxBoundsString))
             }
 
             if let introcardString: String = configuration.introcard?.toJsonString() {
-                queryItems.append(URLQueryItem(name: "introcard", value: "'\(introcardString)'"))
+                queryItems.append(URLQueryItem(name: "introcard", value: introcardString))
             }
         }
         
