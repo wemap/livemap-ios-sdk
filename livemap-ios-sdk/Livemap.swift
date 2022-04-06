@@ -675,6 +675,12 @@ extension wemapsdk {
         let script = "promise = window.livemap.removePolyline('\(id)');"
         webView.evaluateJavaScript(script)
     }
+    
+    public func setCenter(center: Coordinates) {
+        let centerString = center.toJsonString()
+        let script = "promise = window.livemap.setCenter(\(centerString));"
+        webView.evaluateJavaScript(script)
+    }
 }
 
 /// Create a map filter
