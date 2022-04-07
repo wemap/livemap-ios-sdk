@@ -344,7 +344,6 @@ extension wemapsdk: WKScriptMessageHandler {
             }
        
         case .onMapLongClick:
-            print("ngkfgmkgfmgpgp2")
             if let json = message.body as? NSDictionary {
                 onMapLongClick(coordinates: Coordinates.fromDictionary(json))
             }
