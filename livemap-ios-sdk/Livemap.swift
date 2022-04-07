@@ -678,6 +678,12 @@ extension wemapsdk {
         let script = "promise = window.livemap.setCenter(\(centerString));"
         webView.evaluateJavaScript(script)
     }
+    
+    public func centerTo(center: Coordinates, zoom: Double) {
+        let centerString = center.toJsonString()
+        let script = "promise = window.livemap.centerTo(\(centerString), \(zoom));"
+        webView.evaluateJavaScript(script)
+    }
 }
 
 /// Create a map filter
