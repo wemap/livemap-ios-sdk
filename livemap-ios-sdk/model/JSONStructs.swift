@@ -217,10 +217,11 @@ public class PolylineOptions: JSON {
     public let width: Float?;
     public let useNetwork: Bool?;
     
-    init(color: String? = "2F7DE1",
-         opacity: Float? = 0.8,
-         width: Float? = 4,
-         useNetwork: Bool? = false) {
+    init(color: String? = nil,
+         opacity: Float? = nil,
+         width: Float? = nil,
+         useNetwork: Bool? = nil
+    ) {
         self.color = color
         self.opacity = opacity
         self.width = width
@@ -242,12 +243,14 @@ public class PolylineOptions: JSON {
     }
     
     public override func toDictionary() -> [String: Any] {
-        return [
-            "color": self.color as Any,
-            "opacity": self.opacity as Any,
-            "width": self.width as Any,
-            "useNetwork": self.useNetwork as Any
-        ]
+        var optionsDict: [String: Any] = [String: Any]()
+        
+        if(self.color != nil) { optionsDict["color"] = self.color }
+        if(self.opacity != nil) { optionsDict["opacity"] = self.opacity }
+        if(self.width != nil) { optionsDict["width"] = self.width }
+        if(self.useNetwork != nil) { optionsDict["useNetwork"] = self.useNetwork }
+
+        return optionsDict
     }
 }
 
