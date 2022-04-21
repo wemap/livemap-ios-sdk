@@ -29,6 +29,7 @@
 		06F8C67E2540707C003B51B3 /* CustomARView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 06F8C67D2540707C003B51B3 /* CustomARView.xib */; };
 		224D88D227BD3CB0007C82D4 /* StructExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224D88D127BD3CB0007C82D4 /* StructExtensions.swift */; };
 		2298E16E27BAC79E00DC3503 /* JSONStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2298E16D27BAC79E00DC3503 /* JSONStructs.swift */; };
+		B9B7D7902810144100E135B5 /* enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9B7D78F2810144100E135B5 /* enums.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -54,6 +55,7 @@
 		06F8C67D2540707C003B51B3 /* CustomARView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomARView.xib; sourceTree = "<group>"; };
 		224D88D127BD3CB0007C82D4 /* StructExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructExtensions.swift; sourceTree = "<group>"; };
 		2298E16D27BAC79E00DC3503 /* JSONStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONStructs.swift; sourceTree = "<group>"; };
+		B9B7D78F2810144100E135B5 /* enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = enums.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,6 +113,7 @@
 			children = (
 				2298E16D27BAC79E00DC3503 /* JSONStructs.swift */,
 				224D88D127BD3CB0007C82D4 /* StructExtensions.swift */,
+				B9B7D78F2810144100E135B5 /* enums.swift */,
 			);
 			path = model;
 			sourceTree = "<group>";
@@ -220,6 +223,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B9B7D7902810144100E135B5 /* enums.swift in Sources */,
 				06F8C673253F2775003B51B3 /* CameraView.swift in Sources */,
 				06F6069A2404206200EF43C1 /* WemapSDKActionsDelegate.swift in Sources */,
 				06F8C67C2540704A003B51B3 /* CustomARView.swift in Sources */,

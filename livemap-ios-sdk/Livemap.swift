@@ -83,6 +83,21 @@ public class wemapsdk: UIView, WKUIDelegate {
 
         arView = CustomARView(frame: frame)
         arView.set(webMapView: webView)
+        
+        func onCameraAuthorizationDenied() -> Void {
+            DispatchQueue.main.async {
+                self.forceARViewMode(mode: ARViewMode.OFF)
+                self.setPermissionsDenied(permissions: ["camera"])
+                self.onStopCamera()
+            }
+        }
+        
+        arView.cameraView.onCameraAuthorizationStatusCheck = { status in
+            if status == .denied { onCameraAuthorizationDenied() }
+        }
+        arView.cameraView.onCameraAuthorizationRequest = { granted in
+            if granted == false { onCameraAuthorizationDenied() }
+        }
 
         self.addSubview(arView)
     }
@@ -522,6 +537,23 @@ extension wemapsdk {
                                         // debugPrint(error)
                                     }
         })
+    }
+    
+    internal func onStartCamera () -> Void {
+        webView.evaluateJavaScript("window.WemapSDK.enableCameraNative()")
+    }
+
+    internal func onStopCamera () -> Void {
+        self.webView.evaluateJavaScript("window.WemapSDK.disableCameraNative()")
+    }
+    
+    internal func setPermissionsDenied (permissions: [String]) -> Void {
+        let jsonPermissions = "[ \(permissions.map({"'\($0)'"}).joined(separator: ",")) ]"
+        self.webView.evaluateJavaScript("window.livemap.setPermissionsDenied(\(jsonPermissions))")
+    }
+    
+    internal func forceARViewMode (mode: ARViewMode) -> Void {
+        self.webView.evaluateJavaScript("window.livemap.forceARViewMode('\(mode)')")
     }
 
     /// Open an event on the map. This can only be used for maps which use events.

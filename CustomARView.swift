@@ -15,7 +15,7 @@ public class CustomARView: UIView {
     var contentView: UIView!
 
     @IBOutlet weak var livemapContenairView: UIView!
-    @IBOutlet fileprivate weak var cameraView: CameraView!
+    @IBOutlet internal weak var cameraView: CameraView!
     
     // MARK: Set Up View
     public override init(frame: CGRect) {

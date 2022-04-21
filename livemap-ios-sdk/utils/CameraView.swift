@@ -11,7 +11,7 @@ import Foundation
 import AVFoundation
 import UIKit
 
-final class CameraView: UIView {
+class CameraView: UIView {
     private lazy var captureDevice: AVCaptureDevice? = AVCaptureDevice.default(.builtInWideAngleCamera,
                                                                                for: .video, position: .back)
 
@@ -47,11 +47,30 @@ final class CameraView: UIView {
             beginSession()
         }
     }
+    
+    public var onCameraAuthorizationRequest: ((_ granted: Bool) -> Void)? = nil
+    public var onCameraAuthorizationStatusCheck: ((_ status: AVAuthorizationStatus) -> Void)? = nil
 
     private func beginSession() {
         do {
             guard let captureDevice = captureDevice else {
                 fatalError("Camera doesn't work on the simulator! You have to test this on an actual device!")
+            }
+            
+            let cameraMediaType = AVMediaType.video
+            let cameraAuthorizationStatus = AVCaptureDevice.authorizationStatus(for: cameraMediaType)
+            
+            if self.onCameraAuthorizationStatusCheck != nil {
+                self.onCameraAuthorizationStatusCheck!(cameraAuthorizationStatus)
+            }
+            
+            if cameraAuthorizationStatus == .notDetermined {
+                // Prompting user for the permission to use the camera.
+                AVCaptureDevice.requestAccess(for: cameraMediaType) { granted in
+                    if self.onCameraAuthorizationRequest != nil {
+                        self.onCameraAuthorizationRequest!(granted)
+                    }
+                }
             }
 
             let deviceInput = try AVCaptureDeviceInput(device: captureDevice)
