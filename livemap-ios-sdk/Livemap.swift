@@ -683,6 +683,12 @@ extension wemapsdk {
     }
     
     @available(iOS 14.0, *)
+    /// Draw a polyline on the map between multiple coordinates.
+    /// You can either draw a raw array of coordinates or use our itinerary service to draw a route between multiple points.
+    /// - Parameters:
+    ///   - coordinatesList: id of lists to be added to the map.
+    ///   - options: the polyline options. Please refer to the [JS documentation](/docs/javascript/livemap#livemapdrawpolyline) to check its default values.
+    ///   - completion: the completion handler which return the id of the created polyline.
     public func drawPolyline(coordinatesList: [Coordinates], options: PolylineOptions? = nil, completion: ((String)->())? = nil) {
         let coordinatesListString = "[ \(coordinatesList.map({ $0.toJsonString() }).joined(separator: ",")) ]"
         
@@ -700,17 +706,25 @@ extension wemapsdk {
         })
     }
     
+    /// Remove a polyline from the map.
+    /// - Parameter id: id of polyline.
     public func removePolyline(id: String) {
         let script = "promise = window.livemap.removePolyline('\(id)');"
         webView.evaluateJavaScript(script)
     }
     
+    /// Center the map on the given position.
+    /// - Parameter center: the new center.
     public func setCenter(center: Coordinates) {
         let centerString = center.toJsonString()
         let script = "promise = window.livemap.setCenter(\(centerString));"
         webView.evaluateJavaScript(script)
     }
     
+    /// Center the map on the given position and set the zoom level.
+    /// - Parameters:
+    ///   - center: the new center.
+    ///   - zoom: the new zoom level.
     public func centerTo(center: Coordinates, zoom: Double) {
         let centerString = center.toJsonString()
         let script = "promise = window.livemap.centerTo(\(centerString), \(zoom));"
