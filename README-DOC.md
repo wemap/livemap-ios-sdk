@@ -1,13 +1,4 @@
----
-id: getting-started
-title: iOS - Getting started
-sidebar_label: Getting started
----
-
-# Code sample for iOS 
-
-https://github.com/wemap/livemap-ios-sdk-sample/blob/master/livemap-ios-sdk-sample/ViewController.swift
-
+# Getting started
 ## Wemap iOS SDK
 
 The Wemap iOS SDK is a library that will handle communication with the Wemap application.
@@ -141,3 +132,7 @@ Start the navigation to a pinpoint from an absolute navigation based on the inte
 Stop the currently running navigation.
 
 For more details, please consult the dedicated section of the documentation.
+
+## Code sample
+
+https://github.com/wemap/livemap-ios-sdk-sample/blob/master/livemap-ios-sdk-sample/ViewController.swift
