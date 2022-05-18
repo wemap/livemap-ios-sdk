@@ -41,7 +41,9 @@ public class wemapsdk: UIView, WKUIDelegate {
     private var webView: WKWebView!
     private var arView: CustomARView!
     public var currentUrl: String = ""
-
+    
+    private var nativeProviders: NativeProviders?
+    
     private lazy var mapViewConfig: WKWebViewConfiguration = {
         let contentController = WKUserContentController()
 
@@ -193,8 +195,15 @@ public class wemapsdk: UIView, WKUIDelegate {
 
 extension wemapsdk: WKNavigationDelegate {
     open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-
         self.waitForReady()
+    }
+    
+    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        if(configuration.enablePolestar) {
+            self.nativeProviders = NativeProviders()
+            self.nativeProviders?.setWebView(webView: self.webView)
+            self.nativeProviders?.bindPolestarProviderToJS()
+        }
     }
 
     open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -379,6 +388,7 @@ extension wemapsdk: WKScriptMessageHandler {
                     print("Unknow itemType: \(type)")
                 }
             }
+            
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -528,6 +538,7 @@ extension wemapsdk {
                 window.livemap.addEventListener('eventClose', detachBookEventClick);
             });
         """
+        
         webView.evaluateJavaScript(script,
                                    completionHandler: { res, error in
                                     if let res = res {
@@ -773,9 +784,13 @@ public struct WemapLocation: Codable {
 
 public struct wemapsdk_config {
     public init(
-        token: String?, mapId: Int? = nil, livemapRootUrl: String? = nil, maxbounds: BoundingBox? = nil,
+        token: String?,
+        mapId: Int? = nil,
+        livemapRootUrl: String? = nil,
+        maxbounds: BoundingBox? = nil,
         introcard: IntroCardParameter? = nil,
-        urlParameters: [String]? = nil
+        urlParameters: [String]? = nil,
+        enablePolestar: Bool = false
     ) {
         self.token = token ?? ""
         if let mapId = mapId {
@@ -788,6 +803,7 @@ public struct wemapsdk_config {
         self.maxbounds = maxbounds ?? nil
         self.introcard = introcard ?? nil
         self.urlParameters = urlParameters ?? nil
+        self.enablePolestar = enablePolestar
     }
 
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
@@ -798,6 +814,7 @@ public struct wemapsdk_config {
     public let maxbounds: BoundingBox?
     public let introcard: IntroCardParameter?
     public let urlParameters: [String]?
+    public let enablePolestar: Bool
 }
 
 enum WebCommands: String {

@@ -51,6 +51,60 @@ public class Coordinates: JSON {
     }
 }
 
+public class PolestarCoordinates: JSON {
+    public let lat: Double;
+    public let lng: Double;
+    public let alt: Double?;
+    public let accuracy: Double;
+    public let time: Int;
+    public let bearing: Double;
+
+    /// - Parameters:
+    ///   - latitude: Double
+    ///   - longitude: Double
+    ///   - altitude: Double
+    public init(lat: Double,
+                lng: Double,
+                alt: Double? = nil,
+                accuracy: Double,
+                time: Int,
+                bearing: Double) {
+        self.lat = lat
+        self.lng = lng
+        self.alt = alt
+        self.accuracy = accuracy
+        self.time = time
+        self.bearing = bearing
+    }
+    
+    public static func fromDictionary(_ dict: NSDictionary) -> PolestarCoordinates {
+        let lat = dict["lat"] as! Double;
+        let lng = dict["lng"] as! Double;
+        let alt = dict["alt"] as? Double;
+        let accuracy = dict["accuracy"] as! Double;
+        let time = dict["time"] as! Int;
+        let bearing = dict["bearing"] as! Double;
+
+        return PolestarCoordinates(lat: lat,
+                                   lng: lng,
+                                   alt: alt,
+                                   accuracy: accuracy,
+                                   time: time,
+                                   bearing: bearing)
+    }
+    
+    public override func toDictionary() -> [String: Any] {
+        return [
+            "lat": self.lat,
+            "lng": self.lng,
+            "alt": self.alt as Any,
+            "accuracy": self.accuracy,
+            "time": self.time,
+            "bearing": self.bearing
+        ]
+    }
+}
+
 public class BoundingBox: JSON {
     public let northEast: Coordinates;
     public let southWest: Coordinates;
