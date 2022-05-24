@@ -212,6 +212,16 @@ extension wemapsdk: WKNavigationDelegate {
     open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         debugPrint("didFail")
     }
+    
+    @available(iOS 15.0, *)
+    public func webView(_ webView: WKWebView, requestMediaCapturePermissionFor origin: WKSecurityOrigin, initiatedByFrame frame: WKFrameInfo, type: WKMediaCaptureType, decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        decisionHandler(.grant)
+    }
+    
+    @available(iOS 15.0, *)
+    public func webView(_ webView: WKWebView, requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin, initiatedByFrame frame: WKFrameInfo, decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+        decisionHandler(.grant)
+    }
 }
 
 extension wemapsdk {
