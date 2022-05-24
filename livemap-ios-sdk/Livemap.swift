@@ -40,8 +40,9 @@ public class wemapsdk: UIView, WKUIDelegate {
     private var configuration: wemapsdk_config!
     private var webView: WKWebView!
     private var arView: CustomARView!
-    public var currentUrl: String = ""
+    private let navigatorGeolocation = NavigatorGeolocation();
     
+    public var currentUrl: String = ""
     private var nativeProviders: NativeProviders?
     
     private lazy var mapViewConfig: WKWebViewConfiguration = {
@@ -82,6 +83,7 @@ public class wemapsdk: UIView, WKUIDelegate {
         webView.scrollView.backgroundColor = .clear
 
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
+        navigatorGeolocation.setWebView(webView: webView);
 
         arView = CustomARView(frame: frame)
         arView.set(webMapView: webView)
@@ -196,6 +198,7 @@ public class wemapsdk: UIView, WKUIDelegate {
 extension wemapsdk: WKNavigationDelegate {
     open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.waitForReady()
+        self.webView.evaluateJavaScript(navigatorGeolocation.getJavaScripToEvaluate());
     }
     
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
