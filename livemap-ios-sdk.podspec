@@ -25,10 +25,10 @@ Pod::Spec.new do |spec|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   spec.description  = <<-DESC
-  Description is here.
+  The Wemap iOS SDK is a library that will handle communication with the Wemap application.
                    DESC
 
-  spec.homepage     = "http://EXAMPLE/livemap-ios-sdk"
+  spec.homepage     = "https://github.com/wemap/livemap-ios-sdk"
   spec.license      = "MIT"
   spec.author             = { "Thibault Capelli" => "capellithibault@gmail.com" }
   spec.source       = { :git => "https://github.com/wemap/livemap-ios-sdk.git", :tag => "#{spec.version}" }
@@ -38,10 +38,7 @@ Pod::Spec.new do |spec|
   spec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}", "Libraries/**/*.{modulemap,swift}"
   spec.resources = ["**/*.{xib, png, jpeg, jpg}"]
 
-  spec.xcconfig = { 
-    'SWIFT_INCLUDE_PATHS' => '$(PODS_TARGET_SRCROOT)/Libraries',
-    # 'HEADER_SEARCH_PATHS' => '$(PODS_ROOT)/NAOSDK/Pod/Classes'
-  }
+  spec.xcconfig = { "SWIFT_INCLUDE_PATHS" => "$(PODS_TARGET_SRCROOT)/Libraries" }
 
   spec.frameworks = 'UIKit', 'CoreGraphics'
 
