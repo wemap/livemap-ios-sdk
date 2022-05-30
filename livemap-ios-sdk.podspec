@@ -16,8 +16,8 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "livemap-ios-sdk"
-  spec.version      = "0.0.1"
-  spec.summary      = "A short description of livemap-ios-sdk."
+  spec.version      = "2.0.0"
+  spec.summary      = "The Wemap IOS SDK."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,7 +25,7 @@ Pod::Spec.new do |spec|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   spec.description  = <<-DESC
-  The Wemap iOS SDK is a library that will handle communication with the Wemap application.
+  The Wemap IOS SDK is a library that will handle communication with the Wemap application.
                    DESC
 
   spec.homepage     = "https://github.com/wemap/livemap-ios-sdk"
