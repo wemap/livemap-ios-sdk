@@ -203,8 +203,7 @@ extension wemapsdk: WKNavigationDelegate {
     
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         if(configuration.enablePolestar) {
-            self.nativeProviders = NativeProviders()
-            self.nativeProviders?.setWebView(webView: self.webView)
+            self.nativeProviders?.setNativeProvidersJSObject()
             self.nativeProviders?.bindPolestarProviderToJS()
         }
     }
@@ -227,6 +226,10 @@ extension wemapsdk: WKNavigationDelegate {
 extension wemapsdk {
     public func configure(config: wemapsdk_config) -> wemapsdk {
         self.configuration = config
+        if(configuration.enablePolestar) {
+            self.nativeProviders = NativeProviders()
+            self.nativeProviders?.setWebView(webView: self.webView)
+        }
         return self
     }
 

@@ -20,10 +20,13 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
     
     func setWebView(webView: WKWebView) {
         self.webView = webView
-        self.setNativeProvidersJSObject()
+
+        self.webView.configuration.userContentController.add(self, name: "setPolestarLocationProviderApiKey");
+        self.webView.configuration.userContentController.add(self, name: "startPolestarLocationProvider");
+        self.webView.configuration.userContentController.add(self, name: "stopPolestarLocationProvider");
     }
     
-    private func setNativeProvidersJSObject() {
+    func setNativeProvidersJSObject() {
         self.webView.evaluateJavaScript("window.__nativeProviders = {}")
     }
     
@@ -38,9 +41,6 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
         """;
 
         self.webView.evaluateJavaScript(script)
-        self.webView.configuration.userContentController.add(self, name: "setPolestarLocationProviderApiKey");
-        self.webView.configuration.userContentController.add(self, name: "startPolestarLocationProvider");
-        self.webView.configuration.userContentController.add(self, name: "stopPolestarLocationProvider");
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
