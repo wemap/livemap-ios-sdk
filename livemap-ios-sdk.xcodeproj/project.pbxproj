@@ -29,6 +29,8 @@
 		06F8C67E2540707C003B51B3 /* CustomARView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 06F8C67D2540707C003B51B3 /* CustomARView.xib */; };
 		224D88D227BD3CB0007C82D4 /* StructExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 224D88D127BD3CB0007C82D4 /* StructExtensions.swift */; };
 		2298E16E27BAC79E00DC3503 /* JSONStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2298E16D27BAC79E00DC3503 /* JSONStructs.swift */; };
+		B95472AF28462A6000E7EF0D /* NativeProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95472AD28462A6000E7EF0D /* NativeProviders.swift */; };
+		B95472B028462A6000E7EF0D /* PolestarLocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95472AE28462A6000E7EF0D /* PolestarLocationProvider.swift */; };
 		B9B7D7902810144100E135B5 /* enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9B7D78F2810144100E135B5 /* enums.swift */; };
 /* End PBXBuildFile section */
 
@@ -55,6 +57,8 @@
 		06F8C67D2540707C003B51B3 /* CustomARView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomARView.xib; sourceTree = "<group>"; };
 		224D88D127BD3CB0007C82D4 /* StructExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StructExtensions.swift; sourceTree = "<group>"; };
 		2298E16D27BAC79E00DC3503 /* JSONStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONStructs.swift; sourceTree = "<group>"; };
+		B95472AD28462A6000E7EF0D /* NativeProviders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeProviders.swift; sourceTree = "<group>"; };
+		B95472AE28462A6000E7EF0D /* PolestarLocationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolestarLocationProvider.swift; sourceTree = "<group>"; };
 		B9B7D78F2810144100E135B5 /* enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = enums.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -91,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				224D88D027BD3C93007C82D4 /* model */,
+				B95472AC28462A6000E7EF0D /* providers */,
 				06F8C671253F2753003B51B3 /* utils */,
 				06BDC41A2400133F00527F0F /* livemap_ios_sdk.h */,
 				06BDC41B2400133F00527F0F /* Info.plist */,
@@ -117,6 +122,16 @@
 			);
 			path = model;
 			sourceTree = "<group>";
+		};
+		B95472AC28462A6000E7EF0D /* providers */ = {
+			isa = PBXGroup;
+			children = (
+				B95472AD28462A6000E7EF0D /* NativeProviders.swift */,
+				B95472AE28462A6000E7EF0D /* PolestarLocationProvider.swift */,
+			);
+			name = providers;
+			path = "livemap-ios-sdk/providers";
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -228,6 +243,8 @@
 				06F6069A2404206200EF43C1 /* WemapSDKActionsDelegate.swift in Sources */,
 				06F8C67C2540704A003B51B3 /* CustomARView.swift in Sources */,
 				06BDC423240014FD00527F0F /* Livemap.swift in Sources */,
+				B95472B028462A6000E7EF0D /* PolestarLocationProvider.swift in Sources */,
+				B95472AF28462A6000E7EF0D /* NativeProviders.swift in Sources */,
 				224D88D227BD3CB0007C82D4 /* StructExtensions.swift in Sources */,
 				2298E16E27BAC79E00DC3503 /* JSONStructs.swift in Sources */,
 			);
