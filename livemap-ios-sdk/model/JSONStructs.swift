@@ -417,8 +417,24 @@ public class WemapEvent: JSON {
             "id": self.id,
             "name": self.name,
             "description": self.eventDescription,
-            "pinpoint": self.pinpoint?.toDictionary() as Any,
+            "pinpoint": self.pinpoint?.toJSONObject() as Any,
             "external_data": self.external_data as Any
         ]
+    }
+}
+
+public class Attitude: JSON {
+    let quaternion: [Float];
+
+    public init(quaternion: [Float]) {
+        self.quaternion = quaternion
+    }
+    
+    public static func fromArray(_ array: [Float]) -> Attitude {
+        return Attitude(quaternion: array )
+    }
+    
+    internal override func toJSONObject() -> Any {
+        return self.quaternion
     }
 }
