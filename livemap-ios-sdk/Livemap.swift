@@ -757,6 +757,93 @@ extension wemapsdk {
         let script = "promise = window.livemap.centerTo(\(centerString), \(zoom));"
         webView.evaluateJavaScript(script)
     }
+
+    public func disablePositioningSystem() {
+        let script = "window.livemap.disablePositioningSystem();"
+        webView.evaluateJavaScript(script)
+    }
+    
+    @available(iOS 14.0, *)
+    public func disablePositioningSystem(completionHandler: (()->())? = nil) {
+        let script = "return window.livemap.disablePositioningSystem();"
+
+        webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
+            switch result {
+            case let .failure(error):
+                debugPrint("failure \(error)")
+            case .success(_):
+                completionHandler?()
+            }
+        })
+    }
+    
+    @available(iOS 14.0, *)
+    public func getUserLocation(completionHandler: ((Coordinates)->())? = nil) {
+        let script = "return window.livemap.getUserLocation();"
+
+        webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
+            switch result {
+            case let .failure(error):
+                debugPrint("failure \(error)")
+            case let .success(result):
+                let userLocation = Coordinates.fromDictionary(result as! NSDictionary)
+                completionHandler?(userLocation)
+            }
+        })
+    }
+    
+    public func setUserLocation(userLocation: Coordinates) {
+        let script = "window.livemap.setUserLocation(\(userLocation.toJsonString()));"
+        webView.evaluateJavaScript(script)
+    }
+    
+    @available(iOS 14.0, *)
+    public func setUserLocation(userLocation: Coordinates, completionHandler: (()->())? = nil) {
+        let script = "return window.livemap.setUserLocation(\(userLocation.toJsonString()));"
+
+        webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
+            switch result {
+            case let .failure(error):
+                debugPrint("failure \(error)")
+            case .success(_):
+                completionHandler?()
+            }
+        })
+    }
+    
+    @available(iOS 14.0, *)
+    public func getDeviceAttitude(completionHandler: ((Attitude)->())? = nil) {
+        let script = "return window.livemap.getDeviceAttitude();"
+        
+        webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
+            switch result {
+            case let .failure(error):
+                debugPrint("failure \(error)")
+            case let .success(result):
+                 let attitude = Attitude.fromArray(result as! [Float])
+                completionHandler?(attitude)
+            }
+        })
+    }
+    
+    public func setDeviceAttitude(attitude: Attitude) {
+        let script = "window.livemap.setDeviceAttitude(\(attitude.toJsonString()));"
+        webView.evaluateJavaScript(script)
+    }
+    
+    @available(iOS 14.0, *)
+    public func setDeviceAttitude(attitude: Attitude, completionHandler: (()->())? = nil) {
+        let script = "return window.livemap.setDeviceAttitude(\(attitude.toJsonString()));"
+
+        webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
+            switch result {
+            case let .failure(error):
+                debugPrint("failure \(error)")
+            case .success(_):
+                completionHandler?()
+            }
+        })
+    }
 }
 
 /// Create a map filter
