@@ -13,7 +13,7 @@ public class JSON: NSObject {
         }
     }
 
-    public func toJsonString() -> String {
+    internal func toJsonString() -> String {
         return String(data: self.toJson(), encoding: String.Encoding.ascii) ?? ""
     }
 }
