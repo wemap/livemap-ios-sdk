@@ -48,5 +48,6 @@ Pod::Spec.new do |spec|
   spec.requires_arc = true
 
   spec.dependency "NAOSDK"
+  spec.swift_versions = ["5"]
 
 end
