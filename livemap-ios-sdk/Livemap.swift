@@ -266,7 +266,7 @@ extension wemapsdk {
                 queryItems.append(URLQueryItem(name: "maxbounds", value: maxBoundsString))
             }
 
-            if let introcardString: String = configuration.introcard?.toJsonString() {
+            if let introcardString: String = configuration.introcard?.toJSONString() {
                 queryItems.append(URLQueryItem(name: "introcard", value: introcardString))
             }
         }
@@ -613,7 +613,7 @@ extension wemapsdk {
     /// - Parameter pinpoints: pinpoints to populate the map.
     // WemapPinpoints pinpoints: [WemapPinpoint]
     public func setPinpoints(WemapPinpoints pinpoints: [WemapPinpoint]) {
-        let pinpointsStrings = pinpoints.map { $0.toJsonString() }.joined(separator: ", ")
+        let pinpointsStrings = pinpoints.map { $0.toJSONString() }.joined(separator: ", ")
         let script = "promise = window.livemap.setPinpoints([\(pinpointsStrings)]);"
         webView.evaluateJavaScript(script)
     }
@@ -717,10 +717,10 @@ extension wemapsdk {
     ///   - options: the polyline options. Please refer to the [JS documentation](/docs/javascript/livemap#livemapdrawpolyline) to check its default values.
     ///   - completion: the completion handler which return the id of the created polyline.
     public func drawPolyline(coordinatesList: [Coordinates], options: PolylineOptions? = nil, completion: ((String)->())? = nil) {
-        let coordinatesListString = "[ \(coordinatesList.map({ $0.toJsonString() }).joined(separator: ",")) ]"
+        let coordinatesListString = "[ \(coordinatesList.map({ $0.toJSONString() }).joined(separator: ",")) ]"
         
         let script = """
-            return window.livemap.drawPolyline(\(coordinatesListString), \(options?.toJsonString() ?? "undefined")).then(({id}) => id);
+            return window.livemap.drawPolyline(\(coordinatesListString), \(options?.toJSONString() ?? "undefined")).then(({id}) => id);
         """
                 
         webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
@@ -743,7 +743,7 @@ extension wemapsdk {
     /// Center the map on the given position.
     /// - Parameter center: the new center.
     public func setCenter(center: Coordinates) {
-        let centerString = center.toJsonString()
+        let centerString = center.toJSONString()
         let script = "promise = window.livemap.setCenter(\(centerString));"
         webView.evaluateJavaScript(script)
     }
@@ -753,7 +753,7 @@ extension wemapsdk {
     ///   - center: the new center.
     ///   - zoom: the new zoom level.
     public func centerTo(center: Coordinates, zoom: Double) {
-        let centerString = center.toJsonString()
+        let centerString = center.toJSONString()
         let script = "promise = window.livemap.centerTo(\(centerString), \(zoom));"
         webView.evaluateJavaScript(script)
     }
@@ -793,13 +793,13 @@ extension wemapsdk {
     }
     
     public func setUserLocation(userLocation: Coordinates) {
-        let script = "window.livemap.setUserLocation(\(userLocation.toJsonString()));"
+        let script = "window.livemap.setUserLocation(\(userLocation.toJSONString()));"
         webView.evaluateJavaScript(script)
     }
     
     @available(iOS 14.0, *)
     public func setUserLocation(userLocation: Coordinates, completionHandler: (()->())? = nil) {
-        let script = "return window.livemap.setUserLocation(\(userLocation.toJsonString()));"
+        let script = "return window.livemap.setUserLocation(\(userLocation.toJSONString()));"
 
         webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
             switch result {
@@ -827,13 +827,13 @@ extension wemapsdk {
     }
     
     public func setDeviceAttitude(attitude: Attitude) {
-        let script = "window.livemap.setDeviceAttitude(\(attitude.toJsonString()));"
+        let script = "window.livemap.setDeviceAttitude(\(attitude.toJSONString()));"
         webView.evaluateJavaScript(script)
     }
     
     @available(iOS 14.0, *)
     public func setDeviceAttitude(attitude: Attitude, completionHandler: (()->())? = nil) {
-        let script = "return window.livemap.setDeviceAttitude(\(attitude.toJsonString()));"
+        let script = "return window.livemap.setDeviceAttitude(\(attitude.toJSONString()));"
 
         webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
             switch result {

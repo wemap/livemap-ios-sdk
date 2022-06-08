@@ -5,7 +5,7 @@ public class JSON: NSObject {
         return nil
     }
     
-    internal func toJson() -> Data {
+    internal func toJSON() -> Data {
         do {
             return try JSONSerialization.data(withJSONObject: self.toJSONObject()!, options: [])
         } catch {
@@ -13,8 +13,8 @@ public class JSON: NSObject {
         }
     }
 
-    internal func toJsonString() -> String {
-        return String(data: self.toJson(), encoding: String.Encoding.ascii) ?? ""
+    internal func toJSONString() -> String {
+        return String(data: self.toJSON(), encoding: String.Encoding.ascii) ?? ""
     }
 }
 
