@@ -70,7 +70,7 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
     }
     
     private func providePolestarLocation(coordinates: PolestarCoordinates) {
-        let script = "promise = window.__nativeJsProviders.polestar.callbackPosition('\(coordinates.toJsonString())');"
+        let script = "promise = window.__nativeJsProviders.polestar.callbackPosition('\(coordinates.toJSONString())');"
         self.webView.evaluateJavaScript(script)
     }
 }
