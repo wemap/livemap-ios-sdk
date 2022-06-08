@@ -1,12 +1,13 @@
 import Foundation
+
 public class JSON: NSObject {
-    public func toDictionary() -> [String: Any] {
-        return [String: Any]()
+    internal func toJSONObject() -> Any? {
+        return nil
     }
     
     internal func toJson() -> Data {
         do {
-            return try JSONSerialization.data(withJSONObject: self.toDictionary(), options: [])
+            return try JSONSerialization.data(withJSONObject: self.toJSONObject()!, options: [])
         } catch {
             return Data()
         }
@@ -93,7 +94,7 @@ public class PolestarCoordinates: JSON {
                                    bearing: bearing)
     }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
             "lat": self.lat,
             "lng": self.lng,
@@ -124,10 +125,10 @@ public class BoundingBox: JSON {
         return BoundingBox(northEast: northEast, southWest: southWest)
     }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
-            "northEast": self.northEast.toDictionary(),
-            "southWest": self.southWest.toDictionary(),
+            "northEast": self.northEast.toJSONObject(),
+            "southWest": self.southWest.toJSONObject(),
         ]
     }
     
@@ -187,10 +188,10 @@ public class MapMoved: JSON {
         )
     }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
             "zoom": self.zoom as Any,
-            "bounds": (self.bounds?.toDictionary()) as Any,
+            "bounds": (self.bounds?.toJSONObject()) as Any,
             "latitude": self.latitude as Any,
             "longitude": self.longitude as Any,
         ]
@@ -232,11 +233,11 @@ public class ContentUpdatedQuery: JSON {
         )
     }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
             "query": self.query as Any,
             "tags": self.tags as Any,
-            "bounds": (self.bounds?.toDictionary()) as Any,
+            "bounds": (self.bounds?.toJSONObject()) as Any,
             "minAltitude": self.minAltitude as Any,
             "maxAltitude": self.maxAltitude as Any
         ]
@@ -258,7 +259,7 @@ public class IntroCardParameter: JSON {
         return IntroCardParameter(active: active)
     }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
             "active": self.active as Any
         ]
@@ -296,7 +297,7 @@ public class PolylineOptions: JSON {
         )
     }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         var optionsDict: [String: Any] = [String: Any]()
         
         if(self.color != nil) { optionsDict["color"] = self.color }
@@ -352,7 +353,7 @@ public class WemapPinpoint: JSON {
 //        )
 //    }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
             "id": self.id,
             "longitude": self.longitude,
