@@ -407,7 +407,7 @@ public class WemapEvent: JSON {
 //        )
 //    }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
             "id": self.id,
             "name": self.name,
