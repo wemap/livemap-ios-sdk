@@ -14,3 +14,13 @@
 ### Others
 
 * Add support for Cocoapods
+
+## 2.0.0 - June 8, 2022
+
+### Features
+
+* Add new methods `disablePositioningSystem`, `getDeviceAttitude`, `setDeviceAttitude`, `getUserLocation` and `setUserLocation`.
+
+### Others
+
+* BREAKING CHANGE: Rename some methods of the JSON class to be more consistent.
