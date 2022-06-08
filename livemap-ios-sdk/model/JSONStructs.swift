@@ -22,6 +22,7 @@ public class Coordinates: JSON {
     public let latitude: Double;
     public let longitude: Double;
     public let altitude: Double?;
+    public let accuracy: Float?
 
     /// - Parameters:
     ///   - latitude: Double
@@ -29,25 +30,29 @@ public class Coordinates: JSON {
     ///   - altitude: Double
     public init(latitude: Double,
                 longitude: Double,
-                altitude: Double?) {
+                altitude: Double? = nil,
+                accuracy: Float? = nil) {
         self.latitude = latitude
         self.longitude = longitude
         self.altitude = altitude
+        self.accuracy = accuracy
     }
     
     public static func fromDictionary(_ dict: NSDictionary) -> Coordinates {
         let latitude = dict["latitude"] as! Double;
         let longitude = dict["longitude"] as! Double;
         let altitude = dict["altitude"] as? Double;
+        let accuracy = dict["accuracy"] as? Float;
         
-        return Coordinates(latitude: latitude, longitude: longitude, altitude: altitude)
+        return Coordinates(latitude: latitude, longitude: longitude, altitude: altitude, accuracy: accuracy)
     }
     
-    public override func toDictionary() -> [String: Any] {
+    internal override func toJSONObject() -> Any {
         return [
             "latitude": self.latitude,
             "longitude": self.longitude,
-            "altitude": self.altitude as Any
+            "altitude": self.altitude as Any,
+            "accuracy": self.accuracy as Any
         ]
     }
 }
