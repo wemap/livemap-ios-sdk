@@ -31,7 +31,7 @@ Pod::Spec.new do |spec|
   spec.homepage     = "https://github.com/wemap/livemap-ios-sdk"
   spec.license      = "MIT"
   spec.author       = { "Thibault Capelli" => "thibault.capelli@getwemap.com" }
-  spec.source       = { :git => "git@github.com:wemap/livemap-ios-sdk.git", :tag => "#{spec.version}" }
+  spec.source       = { :git => "https://github.com/wemap/livemap-ios-sdk.git", :tag => "#{spec.version}" }
 
   spec.ios.deployment_target = '10.0'
 
