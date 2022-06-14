@@ -12,7 +12,7 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
     var webView: WKWebView!
     
     var polestarLocationProviderApiKey: String?
-    var polestarLocationProvider: PolestarLocationProvider?
+    var polestarLocationProxy: PolestarLocationProxy?
     
     override init() {
         super.init()
@@ -52,20 +52,20 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
 
         if (message.name == "startPolestarLocationProvider") {
             if let polestarLocationProviderApiKey = self.polestarLocationProviderApiKey {
-                self.polestarLocationProvider = PolestarLocationProvider(apikey: polestarLocationProviderApiKey);
+                self.polestarLocationProxy = PolestarLocationProxy(apikey: polestarLocationProviderApiKey);
             }
             
-            if let polestarLocationProvider = self.polestarLocationProvider {
-                polestarLocationProvider.didLocationChangeCallback = { coordinates in
+            if let polestarLocationProxy = self.polestarLocationProxy {
+                polestarLocationProxy.didLocationChangeCallback = { coordinates in
                     self.providePolestarLocation(coordinates: coordinates);
                 }
             }
             
-            self.polestarLocationProvider?.start();
+            self.polestarLocationProxy?.provider?.start();
         }
 
         if (message.name == "stopPolestarLocationProvider") {
-            self.polestarLocationProvider?.stop()
+            self.polestarLocationProxy?.provider?.stop()
         }
     }
     

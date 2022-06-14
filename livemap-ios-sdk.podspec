@@ -35,19 +35,16 @@ Pod::Spec.new do |spec|
 
   spec.ios.deployment_target = '10.0'
 
-  spec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}", "Libraries/**/*.{modulemap,swift}"
+  spec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}"
   spec.resources = ["**/*.{xib, png, jpeg, jpg}"]
 
-  spec.xcconfig = { "SWIFT_INCLUDE_PATHS" => "$(PODS_TARGET_SRCROOT)/Libraries" }
+  spec.xcconfig = { 
+    "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
+    'OTHER_LDFLAGS' => ['$(inherited)', '-weak_framework "NAOSwiftProvider"']
+  }
 
   spec.frameworks = 'UIKit', 'CoreGraphics'
 
   spec.static_framework = true
-  spec.libraries = "c++", "z", "NAOSDK"
-  spec.frameworks  = "CoreBluetooth", "CoreLocation", "CoreMotion", "SystemConfiguration"
-  spec.requires_arc = true
-
-  spec.dependency "NAOSDK"
-  spec.swift_versions = ["5"]
 
 end

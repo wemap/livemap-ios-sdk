@@ -32,6 +32,7 @@
 		B95472AF28462A6000E7EF0D /* NativeProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95472AD28462A6000E7EF0D /* NativeProviders.swift */; };
 		B95472B028462A6000E7EF0D /* PolestarLocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95472AE28462A6000E7EF0D /* PolestarLocationProvider.swift */; };
 		B987E82D2858D0630082ED85 /* NavigatorGeolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B987E82C2858D0630082ED85 /* NavigatorGeolocation.swift */; };
+		B987E8332859D30E0082ED85 /* String.swift in Sources */ = {isa = PBXBuildFile; fileRef = B987E8322859D30E0082ED85 /* String.swift */; };
 		B9B7D7902810144100E135B5 /* enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9B7D78F2810144100E135B5 /* enums.swift */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +62,7 @@
 		B95472AD28462A6000E7EF0D /* NativeProviders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeProviders.swift; sourceTree = "<group>"; };
 		B95472AE28462A6000E7EF0D /* PolestarLocationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolestarLocationProvider.swift; sourceTree = "<group>"; };
 		B987E82C2858D0630082ED85 /* NavigatorGeolocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigatorGeolocation.swift; sourceTree = "<group>"; };
+		B987E8322859D30E0082ED85 /* String.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = String.swift; sourceTree = "<group>"; };
 		B9B7D78F2810144100E135B5 /* enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = enums.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -96,6 +98,7 @@
 		06BDC4192400133F00527F0F /* livemap-ios-sdk */ = {
 			isa = PBXGroup;
 			children = (
+				B987E8312859D2D70082ED85 /* extensions */,
 				224D88D027BD3C93007C82D4 /* model */,
 				B95472AC28462A6000E7EF0D /* providers */,
 				06F8C671253F2753003B51B3 /* utils */,
@@ -135,6 +138,14 @@
 			name = providers;
 			path = "livemap-ios-sdk/providers";
 			sourceTree = SOURCE_ROOT;
+		};
+		B987E8312859D2D70082ED85 /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				B987E8322859D30E0082ED85 /* String.swift */,
+			);
+			path = extensions;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -242,6 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B9B7D7902810144100E135B5 /* enums.swift in Sources */,
+				B987E8332859D30E0082ED85 /* String.swift in Sources */,
 				06F8C673253F2775003B51B3 /* CameraView.swift in Sources */,
 				06F6069A2404206200EF43C1 /* WemapSDKActionsDelegate.swift in Sources */,
 				06F8C67C2540704A003B51B3 /* CustomARView.swift in Sources */,
