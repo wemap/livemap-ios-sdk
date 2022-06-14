@@ -37,24 +37,35 @@ Pod::Spec.new do |spec|
 
   spec.static_framework = true
 
-  spec.default_subspec  = "Main"
+  ## ******************************************************************************
+  spec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}"
+  spec.resources = ["**/*.{xib, png, jpeg, jpg}"]
 
-  spec.subspec 'Main' do |subspec|
-    subspec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}"
-    subspec.resources = ["**/*.{xib, png, jpeg, jpg}"]
-    subspec.frameworks = 'UIKit', 'CoreGraphics'
+  spec.xcconfig = { 
+    "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
+  }
+  ## ******************************************************************************
 
-    subspec.xcconfig = { 
-      "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
-    }
-  end
+  ## ******************************************************************************
+  # spec.default_subspec  = "Main"
 
-    # spec.xcconfig = { 
-    #   "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
-    #   'OTHER_LDFLAGS' => ['$(inherited)', '-weak_framework "NAOSwiftProvider"']
+  # spec.subspec 'Main' do |subspec|
+  #   subspec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}"
+  #   subspec.resources = ["**/*.{xib, png, jpeg, jpg}"]
+  #   subspec.frameworks = 'UIKit', 'CoreGraphics'
 
-    #   # TO TEST
-    #   'OTHER_SWIFT_FLAGS' => ['$(inherited)', '-Xcc -fmodule-map-file="${PODS_CONFIGURATION_BUILD_DIR}/Feature/Feature.modulemap"']
-    # }
+  #   subspec.xcconfig = { 
+  #     "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
+  #   }
+  # end
+  ## ******************************************************************************
+
+  # spec.xcconfig = { 
+  #   "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
+  #   'OTHER_LDFLAGS' => ['$(inherited)', '-weak_framework "NAOSwiftProvider"']
+
+  #   # TO TEST
+  #   'OTHER_SWIFT_FLAGS' => ['$(inherited)', '-Xcc -fmodule-map-file="${PODS_CONFIGURATION_BUILD_DIR}/Feature/Feature.modulemap"']
+  # }
 
 end
