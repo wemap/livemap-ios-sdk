@@ -31,6 +31,7 @@
 		2298E16E27BAC79E00DC3503 /* JSONStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2298E16D27BAC79E00DC3503 /* JSONStructs.swift */; };
 		B95472AF28462A6000E7EF0D /* NativeProviders.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95472AD28462A6000E7EF0D /* NativeProviders.swift */; };
 		B95472B028462A6000E7EF0D /* PolestarLocationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B95472AE28462A6000E7EF0D /* PolestarLocationProvider.swift */; };
+		B987E82D2858D0630082ED85 /* NavigatorGeolocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B987E82C2858D0630082ED85 /* NavigatorGeolocation.swift */; };
 		B9B7D7902810144100E135B5 /* enums.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9B7D78F2810144100E135B5 /* enums.swift */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,7 @@
 		2298E16D27BAC79E00DC3503 /* JSONStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONStructs.swift; sourceTree = "<group>"; };
 		B95472AD28462A6000E7EF0D /* NativeProviders.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeProviders.swift; sourceTree = "<group>"; };
 		B95472AE28462A6000E7EF0D /* PolestarLocationProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PolestarLocationProvider.swift; sourceTree = "<group>"; };
+		B987E82C2858D0630082ED85 /* NavigatorGeolocation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NavigatorGeolocation.swift; sourceTree = "<group>"; };
 		B9B7D78F2810144100E135B5 /* enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = enums.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -108,6 +110,7 @@
 		06F8C671253F2753003B51B3 /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				B987E82C2858D0630082ED85 /* NavigatorGeolocation.swift */,
 				06F8C672253F2775003B51B3 /* CameraView.swift */,
 			);
 			path = utils;
@@ -246,6 +249,7 @@
 				B95472B028462A6000E7EF0D /* PolestarLocationProvider.swift in Sources */,
 				B95472AF28462A6000E7EF0D /* NativeProviders.swift in Sources */,
 				224D88D227BD3CB0007C82D4 /* StructExtensions.swift in Sources */,
+				B987E82D2858D0630082ED85 /* NavigatorGeolocation.swift in Sources */,
 				2298E16E27BAC79E00DC3503 /* JSONStructs.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
