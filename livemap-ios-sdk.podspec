@@ -35,16 +35,26 @@ Pod::Spec.new do |spec|
 
   spec.ios.deployment_target = '10.0'
 
-  spec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}"
-  spec.resources = ["**/*.{xib, png, jpeg, jpg}"]
-
-  spec.xcconfig = { 
-    "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
-    'OTHER_LDFLAGS' => ['$(inherited)', '-weak_framework "NAOSwiftProvider"']
-  }
-
-  spec.frameworks = 'UIKit', 'CoreGraphics'
-
   spec.static_framework = true
+
+  spec.default_subspec  = "Main"
+
+  spec.subspec 'Main' do |subspec|
+    subspec.source_files  = "livemap-ios-sdk/**/*.{swift}", "CustomARView.{swift}"
+    subspec.resources = ["**/*.{xib, png, jpeg, jpg}"]
+    subspec.frameworks = 'UIKit', 'CoreGraphics'
+
+    subspec.xcconfig = { 
+      "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
+    }
+  end
+
+    # spec.xcconfig = { 
+    #   "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
+    #   'OTHER_LDFLAGS' => ['$(inherited)', '-weak_framework "NAOSwiftProvider"']
+
+    #   # TO TEST
+    #   'OTHER_SWIFT_FLAGS' => ['$(inherited)', '-Xcc -fmodule-map-file="${PODS_CONFIGURATION_BUILD_DIR}/Feature/Feature.modulemap"']
+    # }
 
 end

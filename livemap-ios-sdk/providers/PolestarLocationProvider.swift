@@ -17,10 +17,8 @@ import CoreLocation
     class PolestarLocationProvider {}
 #endif
 
-import NAOSwiftProvider
-
 class PolestarLocationProxy: PolestarLocationProviderDelegate {
-    let provider: PolestarLocationProvider?
+    var provider: PolestarLocationProvider? = nil
 
     // Callbacks
     internal var didLocationChangeCallback: ((_ coordinates: PolestarCoordinates) -> Void)? = nil;
@@ -65,3 +63,4 @@ class PolestarLocationProxy: PolestarLocationProviderDelegate {
     func didSynchronizationFailure(_ message: String!) {}
 
 }
+
