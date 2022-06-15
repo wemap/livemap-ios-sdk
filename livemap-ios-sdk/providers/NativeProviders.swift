@@ -12,7 +12,7 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
     var webView: WKWebView!
     
     var polestarLocationProviderApiKey: String?
-    var polestarLocationProvider: PolestarLocationProvider?
+    var polestarLocationProxy: PolestarLocationProxy?
     
     override init() {
         super.init()
@@ -31,6 +31,7 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
     }
     
     func bindPolestarProviderToJS() {
+        #if canImport(NAOSwiftProvider)
         let script = """
             window.__nativeProviders.getPoleStarProvider = () => ({
                 setApiKey: (apiKey) => window.webkit.messageHandlers.setPolestarLocationProviderApiKey.postMessage(apiKey),
@@ -41,32 +42,35 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
         """;
 
         self.webView.evaluateJavaScript(script)
+        #endif
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if (message.name == "setPolestarLocationProviderApiKey") {
-            if let apiKey = message.body as? String {
-                self.polestarLocationProviderApiKey = apiKey
-            }
-        }
-
-        if (message.name == "startPolestarLocationProvider") {
-            if let polestarLocationProviderApiKey = self.polestarLocationProviderApiKey {
-                self.polestarLocationProvider = PolestarLocationProvider(apikey: polestarLocationProviderApiKey);
-            }
-            
-            if let polestarLocationProvider = self.polestarLocationProvider {
-                polestarLocationProvider.didLocationChangeCallback = { coordinates in
-                    self.providePolestarLocation(coordinates: coordinates);
+        #if canImport(NAOSwiftProvider)
+            if (message.name == "setPolestarLocationProviderApiKey") {
+                if let apiKey = message.body as? String {
+                    self.polestarLocationProviderApiKey = apiKey
                 }
             }
-            
-            self.polestarLocationProvider?.start();
-        }
 
-        if (message.name == "stopPolestarLocationProvider") {
-            self.polestarLocationProvider?.stop()
-        }
+            if (message.name == "startPolestarLocationProvider") {
+                if let polestarLocationProviderApiKey = self.polestarLocationProviderApiKey {
+                    self.polestarLocationProxy = PolestarLocationProxy(apikey: polestarLocationProviderApiKey);
+                }
+                
+                if let polestarLocationProxy = self.polestarLocationProxy {
+                    polestarLocationProxy.didLocationChangeCallback = { coordinates in
+                        self.providePolestarLocation(coordinates: coordinates);
+                    }
+                }
+                
+                self.polestarLocationProxy?.provider?.start();
+            }
+
+            if (message.name == "stopPolestarLocationProvider") {
+                self.polestarLocationProxy?.provider?.stop()
+            }
+        #endif
     }
     
     private func providePolestarLocation(coordinates: PolestarCoordinates) {
