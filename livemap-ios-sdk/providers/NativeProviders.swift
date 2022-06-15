@@ -55,7 +55,11 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
 
             if (message.name == "startPolestarLocationProvider") {
                 if let polestarLocationProviderApiKey = self.polestarLocationProviderApiKey {
-                    self.polestarLocationProxy = PolestarLocationProxy(apikey: polestarLocationProviderApiKey);
+                    do {
+                        try self.polestarLocationProxy = PolestarLocationProxy(apikey: polestarLocationProviderApiKey)
+                    } catch {
+                        print("\(error)")
+                    }
                 }
                 
                 if let polestarLocationProxy = self.polestarLocationProxy {
