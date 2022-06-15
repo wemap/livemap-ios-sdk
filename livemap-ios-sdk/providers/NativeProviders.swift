@@ -49,17 +49,19 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
         #if canImport(NAOSwiftProvider)
             if (message.name == "setPolestarLocationProviderApiKey") {
                 if let apiKey = message.body as? String {
+                    print("setPolestarLocationProviderApiKey", apiKey)
+
                     self.polestarLocationProviderApiKey = apiKey
                 }
             }
 
             if (message.name == "startPolestarLocationProvider") {
-                if let polestarLocationProviderApiKey = self.polestarLocationProviderApiKey {
-                    do {
-                        try self.polestarLocationProxy = PolestarLocationProxy(apikey: polestarLocationProviderApiKey)
-                    } catch {
-                        print("\(error)")
-                    }
+                print("startPolestarLocationProvider", "with emulator key")
+                
+                do {
+                    try self.polestarLocationProxy = PolestarLocationProxy(apikey: "emulator")
+                } catch {
+                    print("\(error)")
                 }
                 
                 if let polestarLocationProxy = self.polestarLocationProxy {
@@ -78,6 +80,8 @@ internal class NativeProviders: NSObject, WKScriptMessageHandler {
     }
     
     private func providePolestarLocation(coordinates: PolestarCoordinates) {
+        print("providePolestarLocation", coordinates.toJSONString())
+        
         let script = "promise = window.__nativeJsProviders.polestar.callbackPosition('\(coordinates.toJSONString())');"
         self.webView.evaluateJavaScript(script)
     }
