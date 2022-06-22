@@ -42,6 +42,7 @@ Pod::Spec.new do |spec|
 
   spec.xcconfig = { 
     "FRAMEWORK_SEARCH_PATHS" => "$(PODS_CONFIGURATION_BUILD_DIR)/NAOSwiftProvider",
+    'OTHER_LDFLAGS' => ['$(inherited)', '-weak_framework "NAOSwiftProvider"']
   }
 
 end
