@@ -438,3 +438,34 @@ public class Attitude: JSON {
         return self.quaternion
     }
 }
+
+public class Marker: JSON {
+    public let coordinates: Coordinates
+    public let img: String
+    public let label: String?
+    
+    public init(coordinates: Coordinates,
+                img: String,
+                label: String? = nil)
+    {
+        self.coordinates = coordinates
+        self.img = img
+        self.label = label
+    }
+    
+    public static func fromDictionary(_ dict: NSDictionary) -> Marker {
+        let coordinates = Coordinates.fromDictionary(dict["coordinates"] as! NSDictionary)
+        let img = dict["img"] as! String
+        let label = dict["label"] as? String
+
+        return Marker(coordinates: coordinates, img: img, label: label)
+    }
+    
+    internal override func toJSONObject() -> Any {
+        return [
+            "coordinates": self.coordinates.toJSONObject(),
+            "img": self.img,
+            "label": self.label as Any
+        ]
+    }
+}

@@ -844,6 +844,37 @@ extension wemapsdk {
             }
         })
     }
+    
+    @available(iOS 14.0, *)
+    /// Add a marker to the map.
+    /// - Parameters:
+    ///   - marker: marker to add on the map.
+    ///   - completion: the completion handler which return the id of the created marker.
+    public func addMarker(marker: Marker, completion: ((String)->())? = nil) {
+        print(marker.toJSONString())
+        
+        let script = """
+            return window.livemap.addMarker(\(marker.toJSONString())).then(({id}) => id);
+        """
+                
+        webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
+            print(result)
+            
+            switch result {
+            case let .failure(error):
+                debugPrint("failure \(error)")
+            case let .success(result):
+                completion?(result as! String)
+            }
+        })
+    }
+    
+    /// Remove a marker to the map.
+    /// - Parameter id: the marker id to remove.
+    public func removeMarker(id: String) {
+        let script = "window.livemap.removeMarker('\(id)');"
+        webView.evaluateJavaScript(script)
+    }
 }
 
 /// Create a map filter
