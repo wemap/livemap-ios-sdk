@@ -709,13 +709,13 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
     
-    @available(iOS 14.0, *)
     /// Draw a polyline on the map between multiple coordinates.
     /// You can either draw a raw array of coordinates or use our itinerary service to draw a route between multiple points.
     /// - Parameters:
     ///   - coordinatesList: id of lists to be added to the map.
     ///   - options: the polyline options. Please refer to the [JS documentation](/docs/javascript/livemap#livemapdrawpolyline) to check its default values.
     ///   - completion: the completion handler which return the id of the created polyline.
+    @available(iOS 14.0, *)
     public func drawPolyline(coordinatesList: [Coordinates], options: PolylineOptions? = nil, completion: ((String)->())? = nil) {
         let coordinatesListString = "[ \(coordinatesList.map({ $0.toJSONString() }).joined(separator: ",")) ]"
         
@@ -757,15 +757,16 @@ extension wemapsdk {
         let script = "promise = window.livemap.centerTo(\(centerString), \(zoom));"
         webView.evaluateJavaScript(script)
     }
-
+    
+    /// Disable the inner positioning system You can still use setUserLocation to set the user location and use your own positioning system.
     public func disablePositioningSystem() {
         let script = "window.livemap.disablePositioningSystem();"
         webView.evaluateJavaScript(script)
     }
     
-    @available(iOS 14.0, *)
     /// Disable the inner positioning system You can still use setUserLocation to set the user location and use your own positioning system.
     /// - Parameter completionHandler: A handler block to execute if no exception is raised.
+    @available(iOS 14.0, *)
     public func disablePositioningSystem(completionHandler: (()->())? = nil) {
         let script = "return window.livemap.disablePositioningSystem();"
 
@@ -779,9 +780,9 @@ extension wemapsdk {
         })
     }
     
-    @available(iOS 14.0, *)
     /// Get the user location.
     /// - Parameter completionHandler: A handler block to execute if the user accepts to share his location.
+    @available(iOS 14.0, *)
     public func getUserLocation(completionHandler: ((Coordinates)->())? = nil) {
         let script = "return window.livemap.getUserLocation();"
 
@@ -803,11 +804,11 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
     
-    @available(iOS 14.0, *)
     /// A marker will be added to show the user’s location on the map. If the map features multiple floors, the marker will only be visible on the corresponding floor.
     /// - Parameters:
     ///   - userLocation: The user location.
     ///   - completionHandler: A handler block to execute if no exception is raised.
+    @available(iOS 14.0, *)
     public func setUserLocation(userLocation: Coordinates, completionHandler: (()->())? = nil) {
         let script = "return window.livemap.setUserLocation(\(userLocation.toJSONString()));"
 
@@ -821,9 +822,9 @@ extension wemapsdk {
         })
     }
     
-    @available(iOS 14.0, *)
     /// Get the device attitude.
     /// - Parameter completionHandler: A handler block to execute with the device attitude as first parameter if no exception is raised.
+    @available(iOS 14.0, *)
     public func getDeviceAttitude(completionHandler: ((Attitude)->())? = nil) {
         let script = "return window.livemap.getDeviceAttitude();"
         
@@ -845,11 +846,11 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
     
-    @available(iOS 14.0, *)
     /// Set the user attitude.
     /// - Parameters:
     ///   - attitude: The device attitude.
     ///   - completionHandler: A handler block to execute with the device attitude as first parameter if no exception is raised.
+    @available(iOS 14.0, *)
     public func setDeviceAttitude(attitude: Attitude, completionHandler: (()->())? = nil) {
         let script = "return window.livemap.setDeviceAttitude(\(attitude.toJSONString()));"
 
@@ -863,11 +864,11 @@ extension wemapsdk {
         })
     }
     
-    @available(iOS 14.0, *)
     /// Add a marker to the map.
     /// - Parameters:
     ///   - marker: marker to add on the map.
     ///   - completion: the completion handler which return the id of the created marker.
+    @available(iOS 14.0, *)
     public func addMarker(marker: Marker, completion: ((String)->())? = nil) {
         print(marker.toJSONString())
         
