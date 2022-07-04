@@ -764,6 +764,8 @@ extension wemapsdk {
     }
     
     @available(iOS 14.0, *)
+    /// Disable the inner positioning system You can still use setUserLocation to set the user location and use your own positioning system.
+    /// - Parameter completionHandler: A handler block to execute if no exception is raised.
     public func disablePositioningSystem(completionHandler: (()->())? = nil) {
         let script = "return window.livemap.disablePositioningSystem();"
 
@@ -778,6 +780,8 @@ extension wemapsdk {
     }
     
     @available(iOS 14.0, *)
+    /// Get the user location.
+    /// - Parameter completionHandler: A handler block to execute if the user accepts to share his location.
     public func getUserLocation(completionHandler: ((Coordinates)->())? = nil) {
         let script = "return window.livemap.getUserLocation();"
 
@@ -792,12 +796,18 @@ extension wemapsdk {
         })
     }
     
+    /// A marker will be added to show the user’s location on the map. If the map features multiple floors, the marker will only be visible on the corresponding floor.
+    /// - Parameter userLocation: The user location.
     public func setUserLocation(userLocation: Coordinates) {
         let script = "window.livemap.setUserLocation(\(userLocation.toJSONString()));"
         webView.evaluateJavaScript(script)
     }
     
     @available(iOS 14.0, *)
+    /// A marker will be added to show the user’s location on the map. If the map features multiple floors, the marker will only be visible on the corresponding floor.
+    /// - Parameters:
+    ///   - userLocation: The user location.
+    ///   - completionHandler: A handler block to execute if no exception is raised.
     public func setUserLocation(userLocation: Coordinates, completionHandler: (()->())? = nil) {
         let script = "return window.livemap.setUserLocation(\(userLocation.toJSONString()));"
 
@@ -812,6 +822,8 @@ extension wemapsdk {
     }
     
     @available(iOS 14.0, *)
+    /// Get the device attitude.
+    /// - Parameter completionHandler: A handler block to execute with the device attitude as first parameter if no exception is raised.
     public func getDeviceAttitude(completionHandler: ((Attitude)->())? = nil) {
         let script = "return window.livemap.getDeviceAttitude();"
         
@@ -826,12 +838,18 @@ extension wemapsdk {
         })
     }
     
+    /// Set the user attitude.
+    /// - Parameter attitude: The device attitude.
     public func setDeviceAttitude(attitude: Attitude) {
         let script = "window.livemap.setDeviceAttitude(\(attitude.toJSONString()));"
         webView.evaluateJavaScript(script)
     }
     
     @available(iOS 14.0, *)
+    /// Set the user attitude.
+    /// - Parameters:
+    ///   - attitude: The device attitude.
+    ///   - completionHandler: A handler block to execute with the device attitude as first parameter if no exception is raised.
     public func setDeviceAttitude(attitude: Attitude, completionHandler: (()->())? = nil) {
         let script = "return window.livemap.setDeviceAttitude(\(attitude.toJSONString()));"
 
