@@ -323,6 +323,11 @@ public class WemapPinpoint: JSON {
     public let name: String;
     public let pinpointDescription: String
     public let external_data: NSDictionary?;
+    public let image_url: String;
+    public let media_url: String;
+    public let media_type: String
+    public let geo_entity_shape: NSDictionary?;
+    public let tags: [String]?;
 
     /// - Parameter json: { id, longitude, latitude, name, description, external_data }
     public init(_ json: NSDictionary) {
@@ -336,6 +341,19 @@ public class WemapPinpoint: JSON {
             self.external_data = external_data as? NSDictionary
         } else {
             self.external_data = nil
+        }
+        self.image_url = json["image_url"] as! String
+        self.media_url = json["media_url"] as! String
+        self.media_type = json["media_type"] as! String
+        if let geo_entity_shape = json["geo_entity_shape"] {
+            self.geo_entity_shape = geo_entity_shape as? NSDictionary
+        } else {
+            self.geo_entity_shape = nil
+        }
+        if let tags = json["tags"] {
+            self.tags = tags as? [String]
+        } else {
+            self.tags = nil
         }
     }
     
@@ -366,6 +384,11 @@ public class WemapPinpoint: JSON {
             "name": self.name,
             "description": self.pinpointDescription,
             "external_data": self.external_data as Any,
+            "image_url": self.image_url,
+            "media_url": self.media_url,
+            "media_type": self.media_type,
+            "geo_entity_shape": self.geo_entity_shape as Any,
+            "tags": self.tags as Any
         ]
     }
 }
