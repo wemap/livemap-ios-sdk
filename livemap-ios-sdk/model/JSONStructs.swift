@@ -47,7 +47,7 @@ public class Coordinates: JSON {
         return Coordinates(latitude: latitude, longitude: longitude, altitude: altitude, accuracy: accuracy)
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "latitude": self.latitude,
             "longitude": self.longitude,
@@ -99,7 +99,7 @@ public class PolestarCoordinates: JSON {
                                    bearing: bearing)
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "lat": self.lat,
             "lng": self.lng,
@@ -130,7 +130,7 @@ public class BoundingBox: JSON {
         return BoundingBox(northEast: northEast, southWest: southWest)
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "northEast": self.northEast.toJSONObject(),
             "southWest": self.southWest.toJSONObject(),
@@ -193,7 +193,7 @@ public class MapMoved: JSON {
         )
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "zoom": self.zoom as Any,
             "bounds": (self.bounds?.toJSONObject()) as Any,
@@ -238,7 +238,7 @@ public class ContentUpdatedQuery: JSON {
         )
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "query": self.query as Any,
             "tags": self.tags as Any,
@@ -264,7 +264,7 @@ public class IntroCardParameter: JSON {
         return IntroCardParameter(active: active)
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "active": self.active as Any
         ]
@@ -302,7 +302,7 @@ public class PolylineOptions: JSON {
         )
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         var optionsDict: [String: Any] = [String: Any]()
         
         if(self.color != nil) { optionsDict["color"] = self.color }
@@ -376,7 +376,7 @@ public class WemapPinpoint: JSON {
 //        )
 //    }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "id": self.id,
             "longitude": self.longitude,
@@ -435,7 +435,7 @@ public class WemapEvent: JSON {
 //        )
 //    }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "id": self.id,
             "name": self.name,
@@ -484,7 +484,7 @@ public class Marker: JSON {
         return Marker(coordinates: coordinates, img: img, label: label)
     }
     
-    internal override func toJSONObject() -> Any {
+    public override func toJSONObject() -> Any {
         return [
             "coordinates": self.coordinates.toJSONObject(),
             "img": self.img,
