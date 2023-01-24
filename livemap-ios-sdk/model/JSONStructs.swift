@@ -323,9 +323,9 @@ public class WemapPinpoint: JSON {
     public let name: String;
     public let pinpointDescription: String
     public let external_data: NSDictionary?;
-    public let image_url: String;
-    public let media_url: String;
-    public let media_type: String
+    public let image_url: String?;
+    public let media_url: String?;
+    public let media_type: String?;
     public let geo_entity_shape: NSDictionary?;
     public let tags: [String]?;
 
@@ -342,19 +342,11 @@ public class WemapPinpoint: JSON {
         } else {
             self.external_data = nil
         }
-        self.image_url = json["image_url"] as! String
-        self.media_url = json["media_url"] as! String
-        self.media_type = json["media_type"] as! String
-        if let geo_entity_shape = json["geo_entity_shape"] {
-            self.geo_entity_shape = geo_entity_shape as? NSDictionary
-        } else {
-            self.geo_entity_shape = nil
-        }
-        if let tags = json["tags"] {
-            self.tags = tags as? [String]
-        } else {
-            self.tags = nil
-        }
+        self.image_url = json["image_url"] as? String
+        self.media_url = json["media_url"] as? String
+        self.media_type = json["media_type"] as? String
+        self.geo_entity_shape = json["geo_entity_shape"] as? NSDictionary
+        self.tags = json["tags"] as? [String]
     }
     
     // TODO: init it without dictionary and uncomment this method
@@ -384,9 +376,9 @@ public class WemapPinpoint: JSON {
             "name": self.name,
             "description": self.pinpointDescription,
             "external_data": self.external_data as Any,
-            "image_url": self.image_url,
-            "media_url": self.media_url,
-            "media_type": self.media_type,
+            "image_url": self.image_url as Any,
+            "media_url": self.media_url as Any,
+            "media_type": self.media_type as Any,
             "geo_entity_shape": self.geo_entity_shape as Any,
             "tags": self.tags as Any
         ]
