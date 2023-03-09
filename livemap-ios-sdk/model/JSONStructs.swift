@@ -130,6 +130,23 @@ public class BoundingBox: JSON {
         return BoundingBox(northEast: northEast, southWest: southWest)
     }
     
+    public static func fromArray(_ bounds: Array<Double>) -> BoundingBox {
+        let bottomLeft: NSDictionary = [
+            "lng": bounds[0],
+            "lat": bounds[1]
+        ]
+        
+        let topRight: NSDictionary = [
+            "lng": bounds[2],
+            "lat": bounds[3]
+        ]
+
+        let northEast = Coordinates.fromDictionary(bottomLeft);
+        let southWest = Coordinates.fromDictionary(topRight);
+        
+        return BoundingBox(northEast: northEast, southWest: southWest)
+    }
+    
     public override func toJSONObject() -> Any {
         return [
             "northEast": self.northEast.toJSONObject(),

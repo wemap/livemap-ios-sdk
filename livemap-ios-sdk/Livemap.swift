@@ -758,6 +758,18 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
     
+    public func fitBounds() {
+        var bounds = BoundingBox.fromArray([2.294481, 43.609138, 3.884193, 48.85837]);
+        var options: Dictionary = [
+            "padding": [
+                "top": 60,
+            ]
+        ]
+        
+        let script = "promise = window.livemap.fitBounds(\(bounds), \(options.description));"
+        webView.evaluateJavaScript(script)
+    }
+    
     /// Disable the inner positioning system You can still use setUserLocation to set the user location and use your own positioning system.
     public func disablePositioningSystem() {
         let script = "window.livemap.disablePositioningSystem();"
