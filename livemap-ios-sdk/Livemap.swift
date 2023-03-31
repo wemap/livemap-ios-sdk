@@ -674,6 +674,11 @@ extension wemapsdk {
         let script = "promise = window.livemap.closeEvent();"
         webView.evaluateJavaScript(script)
     }
+    
+    public func setZoom(zoom zoom: Double) {
+        let script = "promise = window.livemap.setZoom(\(zoom));"
+        webView.evaluateJavaScript(script)
+    }
 
     /// Open a pinpoint on the map.
     /// - Parameter id: id of the pinpoint to open
