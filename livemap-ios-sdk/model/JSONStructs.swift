@@ -1,5 +1,18 @@
 import Foundation
 
+extension Dictionary where Key: Encodable, Value: Encodable {
+    func asJSONStr() -> String? {
+        let encoder = JSONEncoder()
+        if let jsonData = try? encoder.encode(self) {
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return jsonString
+            }
+        }
+        
+        return nil
+    }
+}
+
 public class JSON: NSObject {
     internal func toJSONObject() -> Any? {
         return nil
@@ -37,6 +50,16 @@ public class Coordinates: JSON {
         self.altitude = altitude
         self.accuracy = accuracy
     }
+    
+    
+    public func toJSONArray() -> Any {
+         do {
+             return [self.longitude, self.latitude]
+        } catch {
+            return []
+        }
+    }
+    
     
     public static func fromDictionary(_ dict: NSDictionary) -> Coordinates {
         let latitude = dict["latitude"] as! Double;
@@ -132,19 +155,27 @@ public class BoundingBox: JSON {
     
     public static func fromArray(_ bounds: Array<Double>) -> BoundingBox {
         let bottomLeft: NSDictionary = [
-            "lng": bounds[0],
-            "lat": bounds[1]
+            "longitude": bounds[0],
+            "latitude": bounds[1]
         ]
         
         let topRight: NSDictionary = [
-            "lng": bounds[2],
-            "lat": bounds[3]
+            "longitude": bounds[2],
+            "latitude": bounds[3]
         ]
 
-        let northEast = Coordinates.fromDictionary(bottomLeft);
-        let southWest = Coordinates.fromDictionary(topRight);
+        let northEast = Coordinates.fromDictionary(topRight);
+        let southWest = Coordinates.fromDictionary(bottomLeft);
         
         return BoundingBox(northEast: northEast, southWest: southWest)
+    }
+    
+    public func toJSONArray() -> Any {
+         do {
+             return [self.southWest.longitude,self.southWest.latitude,self.northEast.longitude,self.northEast.latitude]
+        } catch {
+            return []
+        }
     }
     
     public override func toJSONObject() -> Any {
