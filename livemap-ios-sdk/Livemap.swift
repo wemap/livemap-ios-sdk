@@ -718,6 +718,12 @@ extension wemapsdk {
             webView.evaluateJavaScript(script)
         }
     }
+    
+    public func setIndoorFeatureState(id: Int, state: [String: Any]) {
+        let selected = state["selected"]!
+        let script = "promise = window.livemap.setIndoorFeatureState(\(id), {'selected': \(selected)});"
+        webView.evaluateJavaScript(script)
+    }
 
     /// Start navigation to a pinpoint. The navigation will start with the user location.
     /// - Parameters:
