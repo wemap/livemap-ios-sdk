@@ -24,6 +24,10 @@ import WebKit
     @objc optional func onActionButtonClick(_ wemapController: wemapsdk, event: WemapEvent, actionType: String)
     @objc optional func onContentUpdated(_ wemapController: wemapsdk, events: [WemapEvent], contentUpdatedQuery: ContentUpdatedQuery)
     @objc optional func onContentUpdated(_ wemapController: wemapsdk, pinpoints: [WemapPinpoint], contentUpdatedQuery: ContentUpdatedQuery)
+    @objc optional func onIndoorFeatureClick(_ wemapController: wemapsdk, data: [String: Any])
+    // @objc optional func onFloorChanged(_ wemapController: wemapsdk, data: [String: Any])
+    @objc optional func onIndoorLevelChanged(_ wemapController: wemapsdk, data: [String: Any])
+    @objc optional func onIndoorLevelsChanged(_ wemapController: wemapsdk, data: Array<Any>)
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -192,6 +196,20 @@ public class wemapsdk: UIView, WKUIDelegate {
     
     func onContentUpdated(events: [WemapEvent], contentUpdatedQuery: ContentUpdatedQuery) {
         delegate?.onContentUpdated?(self, events: events, contentUpdatedQuery: contentUpdatedQuery)
+    }
+    
+    func onIndoorFeatureClick(data: [String: Any]) {
+        delegate?.onIndoorFeatureClick?(self, data: data)
+    }
+    
+//    func onFloorChanged(data: [String: Any]) {
+//        delegate?.onFloorChanged?(self, data: data)
+//    }
+    func onIndoorLevelChanged(data: [String: Any]) {
+        delegate?.onIndoorLevelChanged?(self, data: data)
+    }
+    func onIndoorLevelsChanged(data: Array<Any>) {
+        delegate?.onIndoorLevelsChanged?(self, data: data)
     }
 }
 
@@ -405,6 +423,45 @@ extension wemapsdk: WKScriptMessageHandler {
                 }
             }
             
+        case .onIndoorFeatureClick:
+            if let json = message.body as? NSDictionary {
+                let wemapId = json["wemapId"] as! NSNumber
+                let externalId = json["externalId"] as? String
+                onIndoorFeatureClick(data: [
+                    "wemapId": wemapId,
+                    "externalId": externalId
+                ])
+            }
+            
+//        case .onFloorChanged:
+//            if let json = message.body as? NSDictionary {
+//                let floor = json["floor"] as! NSDictionary
+//                let name = floor["name"] as! String
+//                let short_name = floor["short_name"] as ! String
+//                let level = floor["level"] as! Double
+//
+//                onFloorChanged(data: ["name": name])
+//            }
+            
+        case .onIndoorLevelChanged:
+            if let json = message.body as? NSDictionary {
+                let indoorLevel = json["indoorLevel"] as! NSDictionary
+                let name = indoorLevel["name"] as! String
+                let short_name = indoorLevel["short_name"] as! String
+                let level = indoorLevel["level"] as! Double
+            
+                onIndoorLevelChanged(data: ["name": name,
+                                            "short_name": short_name,
+                                            "level": level])
+            }
+            
+        case .onIndoorLevelsChanged:
+            if let json = message.body as? NSDictionary {
+                let indoorLevels = json["indoorLevels"] as! Array<Any>
+            
+                onIndoorLevelsChanged(data: indoorLevels)
+            }
+            
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -519,6 +576,24 @@ extension wemapsdk {
                 const onMapLongClickCallback = (json) => {
                     window.webkit.messageHandlers.onMapLongClick.postMessage(json);
                 };
+        
+                const onIndoorFeatureClickCallback = (json) => {
+                    window.webkit.messageHandlers.onIndoorFeatureClick.postMessage(json);
+                };
+        
+                /*
+                const onFloorChangedCallback = (json) => {
+                    window.webkit.messageHandlers.onFloorChanged.postMessage(json);
+                }
+                */
+        
+                const onIndoorLevelChangedCallback = (json) => {
+                    window.webkit.messageHandlers.onIndoorLevelChangedCallback.postMessage(json);
+                }
+        
+                const onIndoorLevelsChangedCallback = (json) => {
+                    window.webkit.messageHandlers.onIndoorLevelsChangedCallback.postMessage(json);
+                }
 
                 promise = window.livemap.addEventListener('eventOpen', onEventOpenCallback);
                 promise = window.livemap.addEventListener('pinpointOpen', onPinpointOpenCallback);
@@ -533,6 +608,10 @@ extension wemapsdk {
                 promise = window.livemap.addEventListener('mapLongClick', onMapLongClickCallback);
                 promise = window.livemap.addEventListener('actionButtonClick', onActionButtonClickCallback);
                 promise = window.livemap.addEventListener('contentUpdated', onContentUpdatedCallback);
+                promise = window.livemap.addEventListener('indoorFeatureClick', onIndoorFeatureClickCallback);
+                // promise = window.livemap.addEventListener('floorChanged', onFloorChangedCallback);
+                promise = window.livemap.addEventListener('indoorLevelChanged', onIndoorLevelChangedCallback);
+                promise = window.livemap.addEventListener('indoorLevelsChanged', onIndoorLevelsChangedCallback);
 
                 // attach start/stopCamera handler
                 try {
@@ -999,6 +1078,10 @@ enum WebCommands: String {
     case onUserLogout
     case onActionButtonClick
     case onContentUpdated
+    case onIndoorFeatureClick
+//    case onFloorChanged
+    case onIndoorLevelChanged
+    case onIndoorLevelsChanged
 
     // RG stuffs
     case onBookEventClicked
@@ -1027,5 +1110,9 @@ enum WebCommands: String {
                          onMapClick.rawValue,
                          onMapLongClick.rawValue,
                          onActionButtonClick.rawValue,
-                         onContentUpdated.rawValue]
+                         onContentUpdated.rawValue,
+                         onIndoorFeatureClick.rawValue,
+                         // onFloorChanged.rawValue,
+                         onIndoorLevelChanged.rawValue,
+                         onIndoorLevelsChanged.rawValue]
 }
