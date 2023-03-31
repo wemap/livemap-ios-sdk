@@ -843,16 +843,26 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
     
-    public func fitBounds() {
-        var bounds = BoundingBox.fromArray([2.294481, 43.609138, 3.884193, 48.85837]);
-        var options: Dictionary = [
-            "padding": [
-                "top": 60,
-            ]
-        ]
+    public func easeTo(center: Coordinates, zoom: Double?, padding: [String: Double]?) {
+        let centerString = center.toJSONArray() as! [Double]
+        let encoder = JSONEncoder()
+        do {
+            var data: Data = try encoder.encode(EaseToOptions(center: centerString, zoom: zoom, padding: padding))
+            let script = "promise = window.livemap.easeTo(\(String(data: data, encoding: .utf8)!));"
+            webView.evaluateJavaScript(script)
+        } catch {print(error.localizedDescription)}
+    }
+    
+    
+    /// Fit map on given bounds and padding.
+    /// - Parameters:
+    ///   - bounds: [W,S,E,N] bounds.
+    ///   - options: {"padding": {"top": 0, "right": 0, "bottom": 0, "left": 0}}
+    public func fitBounds(bounds: BoundingBox, options: [String: [String: Double]]) {
         
-        let script = "promise = window.livemap.fitBounds(\(bounds), \(options.description));"
-        webView.evaluateJavaScript(script)
+        let optionsString = options.asJSONStr() ?? "{\"padding\":{\"top\": 0, \"bottom\":0, \"right\": 0, \"left\": 0}}"
+        let script = "promise = window.livemap.fitBounds(\(bounds.toJSONArray()), \(optionsString));"
+        webView.evaluateJavaScript("promise = window.livemap.fitBounds(\(bounds.toJSONArray()), \(optionsString));")
     }
     
     /// Disable the inner positioning system You can still use setUserLocation to set the user location and use your own positioning system.
@@ -1030,6 +1040,12 @@ public struct WemapLocation: Codable {
         self.longitude = longitude
         self.latitude = latitude
     }
+}
+
+public struct EaseToOptions: Codable {
+  var center:[Double]
+  var zoom: Double?
+  var padding: [String: Double]?
 }
 
 public struct wemapsdk_config {
