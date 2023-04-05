@@ -849,7 +849,7 @@ extension wemapsdk {
     }
     
     public func easeTo(center: Coordinates, zoom: Double?, padding: [String: Double]?) {
-        let centerObj = center.toJSONObject() as! [String: Double]
+        let centerObj = center.toLngLatJSONObject() as! [String: Double]
         let encoder = JSONEncoder()
         do {
             var data: Data = try encoder.encode(EaseToOptions(center: centerObj, zoom: zoom, padding: padding))
@@ -1048,7 +1048,7 @@ public struct WemapLocation: Codable {
 }
 
 public struct EaseToOptions: Codable {
-  var center:[Double]
+  var center:[String: Double]
   var zoom: Double?
   var padding: [String: Double]?
 }

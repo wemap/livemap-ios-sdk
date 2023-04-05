@@ -70,6 +70,13 @@ public class Coordinates: JSON {
         return Coordinates(latitude: latitude, longitude: longitude, altitude: altitude, accuracy: accuracy)
     }
     
+    public func toLngLatJSONObject() -> [String: Double] {
+        return [
+            "latitude": self.latitude,
+            "longitude": self.longitude
+        ]
+    }
+    
     public override func toJSONObject() -> Any {
         return [
             "latitude": self.latitude,
