@@ -849,10 +849,10 @@ extension wemapsdk {
     }
     
     public func easeTo(center: Coordinates, zoom: Double?, padding: [String: Double]?) {
-        let centerString = center.toJSONArray() as! [Double]
+        let centerObj = center.toJSONObject() as! [String: Double]
         let encoder = JSONEncoder()
         do {
-            var data: Data = try encoder.encode(EaseToOptions(center: centerString, zoom: zoom, padding: padding))
+            var data: Data = try encoder.encode(EaseToOptions(center: centerObj, zoom: zoom, padding: padding))
             let script = "promise = window.livemap.easeTo(\(String(data: data, encoding: .utf8)!));"
             webView.evaluateJavaScript(script)
         } catch {print(error.localizedDescription)}
