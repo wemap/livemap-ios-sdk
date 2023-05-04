@@ -213,6 +213,50 @@ public class BoundingBox: JSON {
     }
 }
 
+public class OfflineOptions: JSON{
+    public let enable: Bool
+    public let tiles: String
+    public let blacklist: Array<Int>
+    
+    public init(enable: Bool, tiles: String, blacklist: Array<Int>) {
+        self.enable = enable
+        self.tiles = tiles
+        self.blacklist = blacklist
+    }
+    
+    public static func fromDictionary(_ dict: NSDictionary) -> OfflineOptions {
+        let enable = dict["enable"] as! Bool
+        let tiles = dict["tiles"] as! String
+        let blacklist = dict["blacklist"] as! Array<Int>
+        
+        return OfflineOptions(enable: enable, tiles: tiles, blacklist: blacklist)
+    }
+    
+    public override func toJSONObject() -> Any {
+        return [
+            "enable": self.enable,
+            "tiles": self.tiles,
+            "blacklist": self.blacklist
+        ] as [String : Any]
+    }
+    
+    public func toUrlParameter () -> String {
+        do {
+            let dict = [
+                "enable": self.enable,
+                "tiles": self.tiles,
+                "blacklist": self.blacklist
+            ] as [String : Any]
+            let jsonData = try JSONSerialization.data(withJSONObject: dict, options: [])
+            
+            return String(data: jsonData, encoding: String.Encoding.ascii) ?? ""
+        } catch {
+            return ""
+        }
+    }
+
+}
+
 public class MapMoved: JSON {
     public let zoom: Double?;
     public let bounds: BoundingBox?;
