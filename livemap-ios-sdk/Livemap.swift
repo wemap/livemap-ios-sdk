@@ -55,10 +55,17 @@ public class wemapsdk: UIView, WKUIDelegate {
         WebCommands.values.forEach { contentController.add(self, name: $0) }
 
         let config = WKWebViewConfiguration()
+        if #available(iOS 14.0, *) {
+            config.limitsNavigationsToAppBoundDomains = true
+        } else {
+            // Fallback on earlier versions
+        }
         config.allowsInlineMediaPlayback = true
         config.userContentController = contentController
+        config.preferences.setValue(true, forKey: "developerExtrasEnabled")
         return config
     }()
+    
 
     public override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if let key = change?[NSKeyValueChangeKey.newKey] {
@@ -217,6 +224,7 @@ extension wemapsdk: WKNavigationDelegate {
     open func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.waitForReady()
         self.webView.evaluateJavaScript(navigatorGeolocation.getJavaScripToEvaluate());
+        print("url load is finish")
     }
     
     public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
@@ -227,6 +235,8 @@ extension wemapsdk: WKNavigationDelegate {
     }
 
     open func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        print("failed")
+        print("error :", error)
         debugPrint("didFail")
     }
     
@@ -298,8 +308,10 @@ extension wemapsdk {
         let url = urlComps.url!
         print(url)
         
+        var urlRequest = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
+//        urlRequest.allowsConstrainedNetworkAccess  = true
         webView.load(
-            URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
+            urlRequest
         )
 
         if (self.currentUrl == "") {
