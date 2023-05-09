@@ -287,11 +287,17 @@ extension wemapsdk {
             if let introcardString: String = configuration.introcard?.toJSONString() {
                 queryItems.append(URLQueryItem(name: "introcard", value: introcardString))
             }
+            
+            if let offlineOptionsString: String = configuration.offlineOptions?.toUrlParameter() {
+                queryItems.append(URLQueryItem(name: "offline", value: offlineOptionsString))
+            }
+            
         }
         
         urlComps.queryItems = queryItems
         let url = urlComps.url!
-
+        print(url)
+        
         webView.load(
             URLRequest(url: url, cachePolicy: .reloadIgnoringLocalAndRemoteCacheData)
         )
@@ -1061,7 +1067,8 @@ public struct wemapsdk_config {
         maxbounds: BoundingBox? = nil,
         introcard: IntroCardParameter? = nil,
         urlParameters: [String]? = nil,
-        enablePolestar: Bool = false
+        enablePolestar: Bool = false,
+        offlineOptions: OfflineOptions? = nil
     ) {
         self.token = token ?? ""
         if let mapId = mapId {
@@ -1075,6 +1082,7 @@ public struct wemapsdk_config {
         self.introcard = introcard ?? nil
         self.urlParameters = urlParameters ?? nil
         self.enablePolestar = enablePolestar
+        self.offlineOptions = offlineOptions ?? nil
     }
 
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
@@ -1086,6 +1094,7 @@ public struct wemapsdk_config {
     public let introcard: IntroCardParameter?
     public let urlParameters: [String]?
     public let enablePolestar: Bool
+    public let offlineOptions: OfflineOptions?
 }
 
 enum WebCommands: String {
