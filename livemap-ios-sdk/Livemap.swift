@@ -866,11 +866,17 @@ extension wemapsdk {
         webView.evaluateJavaScript(script)
     }
     
-    public func easeTo(center: Coordinates, zoom: Double?, padding: [String: Double]?) {
+    public func easeTo(center: Coordinates, zoom: Double?,
+        padding: [String: Double]? = nil,
+        bearing: Double? = nil,
+        pitch: Double? = nil,
+        duration: Double? = nil,
+        animate: Bool? = nil) {
         let centerObj = center.toLngLatJSONObject() as! [String: Double]
         let encoder = JSONEncoder()
         do {
-            var data: Data = try encoder.encode(EaseToOptions(center: centerObj, zoom: zoom, padding: padding))
+            var data: Data = try encoder.encode(EaseToOptions(center: centerObj, zoom: zoom, padding: padding, bearing: bearing, pitch: pitch, duration: duration, animate: animate
+                ))
             let script = "promise = window.livemap.easeTo(\(String(data: data, encoding: .utf8)!));"
             webView.evaluateJavaScript(script)
         } catch {print(error.localizedDescription)}
@@ -1066,9 +1072,13 @@ public struct WemapLocation: Codable {
 }
 
 public struct EaseToOptions: Codable {
-  var center:[String: Double]
-  var zoom: Double?
-  var padding: [String: Double]?
+    var center:[String: Double]
+    var zoom: Double?
+    var padding: [String: Double]?
+    var bearing: Double?
+    var pitch: Double?
+    var duration: Double?
+    var animate: Bool?
 }
 
 public struct wemapsdk_config {
@@ -1096,7 +1106,7 @@ public struct wemapsdk_config {
         self.enablePolestar = enablePolestar
         self.offlineOptions = offlineOptions ?? nil
     }
-
+    
     public static let defaultLivemapRootUrl = "https://livemap.getwemap.com"
     public let token: String
     public let emmid: Int
