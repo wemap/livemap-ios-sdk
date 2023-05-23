@@ -8,6 +8,6 @@
 
 import Foundation
 
-enum ARViewMode {
-  case ON, OFF
+public enum ARViewMode {
+  case ON, OFF, AUTO
 }

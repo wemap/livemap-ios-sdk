@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "livemap-ios-sdk"
-  spec.version      = "2.3.0"
+  spec.version      = "2.4.0"
   spec.summary      = "The Wemap IOS SDK."
 
   # This description is used to generate tags and improve search results.
