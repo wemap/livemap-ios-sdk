@@ -28,6 +28,7 @@ import WebKit
     // @objc optional func onFloorChanged(_ wemapController: wemapsdk, data: [String: Any])
     @objc optional func onIndoorLevelChanged(_ wemapController: wemapsdk, data: [String: Any])
     @objc optional func onIndoorLevelsChanged(_ wemapController: wemapsdk, data: Array<Any>)
+    @objc optional func onPermissionsDenied(_ wemapController: wemapsdk, deniedPermissions: [String])
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -217,6 +218,9 @@ public class wemapsdk: UIView, WKUIDelegate {
     }
     func onIndoorLevelsChanged(data: Array<Any>) {
         delegate?.onIndoorLevelsChanged?(self, data: data)
+    }
+    func onPermissionsDenied(deniedPermissions: [String]){
+        delegate?.onPermissionsDenied?(self, deniedPermissions: deniedPermissions)
     }
 }
 
@@ -480,6 +484,13 @@ extension wemapsdk: WKScriptMessageHandler {
                 onIndoorLevelsChanged(data: indoorLevels)
             }
             
+        case .onPermissionsDenied:
+            if let json = message.body as? NSDictionary {
+                let deniedPermissions = json["permissions"] as! [String]
+                
+                onPermissionsDenied(deniedPermissions: deniedPermissions)
+            }
+            
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -612,7 +623,14 @@ extension wemapsdk {
                 const onIndoorLevelsChangedCallback = (json) => {
                     window.webkit.messageHandlers.onIndoorLevelsChangedCallback.postMessage(json);
                 }
-
+        
+                const onPermissionsDeniedCallback = (json) => {
+                    window.webkit.messageHandlers.onPermissionsDenied
+                        .postMessage(json);
+                }
+                
+                promise = window.livemap.addEventListener('permissionsDenied',
+                    onPermissionsDeniedCallback);
                 promise = window.livemap.addEventListener('eventOpen', onEventOpenCallback);
                 promise = window.livemap.addEventListener('pinpointOpen', onPinpointOpenCallback);
                 promise = window.livemap.addEventListener('eventClose', onEventCloseCallback);
@@ -674,10 +692,6 @@ extension wemapsdk {
     internal func setPermissionsDenied (permissions: [String]) -> Void {
         let jsonPermissions = "[ \(permissions.map({"'\($0)'"}).joined(separator: ",")) ]"
         self.webView.evaluateJavaScript("window.livemap.setPermissionsDenied(\(jsonPermissions))")
-    }
-    
-    internal func forceARViewMode (mode: ARViewMode) -> Void {
-        self.webView.evaluateJavaScript("window.livemap.forceARViewMode('\(mode)')")
     }
 
     /// Open an event on the map. This can only be used for maps which use events.
@@ -1030,6 +1044,13 @@ extension wemapsdk {
         let script = "window.livemap.removeMarker('\(id)');"
         webView.evaluateJavaScript(script)
     }
+    
+    /// Force the AR mode to 'ON', 'OFF' or default 'AUTO'
+    /// - Parameter mode: AR mode
+    public func forceARViewMode(mode: ARViewMode){
+        let script = "window.livemap.forceARViewMode('\(mode)')"
+        webView.evaluateJavaScript(script)
+    }
 }
 
 /// Create a map filter
@@ -1140,6 +1161,7 @@ enum WebCommands: String {
 //    case onFloorChanged
     case onIndoorLevelChanged
     case onIndoorLevelsChanged
+    case onPermissionsDenied
 
     // RG stuffs
     case onBookEventClicked
@@ -1172,5 +1194,6 @@ enum WebCommands: String {
                          onIndoorFeatureClick.rawValue,
                          // onFloorChanged.rawValue,
                          onIndoorLevelChanged.rawValue,
-                         onIndoorLevelsChanged.rawValue]
+                         onIndoorLevelsChanged.rawValue,
+                         onPermissionsDenied.rawValue]
 }
