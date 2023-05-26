@@ -947,6 +947,22 @@ extension wemapsdk {
         })
     }
     
+    /// Get the current zoom level.
+    /// - Parameter completionHandler: A handler block to execute if the zoom level provided.
+    @available(iOS 14.0, *)
+    public func getZoom(completionHandler: ((Double)->())? = nil) {
+        let script = "return window.livemap.getZoom();"
+
+        webView.callAsyncJavaScript(script, in: nil, in: .page, completionHandler: { result in
+            switch result {
+            case let .failure(error):
+                debugPrint("failure \(error)")
+            case let .success(result):
+                completionHandler?(result as! Double)
+            }
+        })
+    }
+    
     /// A marker will be added to show the user’s location on the map. If the map features multiple floors, the marker will only be visible on the corresponding floor.
     /// - Parameter userLocation: The user location.
     public func setUserLocation(userLocation: Coordinates) {
