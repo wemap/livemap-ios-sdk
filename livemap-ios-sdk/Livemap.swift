@@ -29,6 +29,7 @@ import WebKit
     @objc optional func onIndoorLevelChanged(_ wemapController: wemapsdk, data: [String: Any])
     @objc optional func onIndoorLevelsChanged(_ wemapController: wemapsdk, data: Array<Any>)
     @objc optional func onPermissionsDenied(_ wemapController: wemapsdk, deniedPermissions: [String])
+    @objc optional func onInaccurateMagnetometer(_ wemapController: wemapsdk)
 
     // RG stuffs
     @objc optional func onBookEventClicked(_ wemapController: wemapsdk, event: WemapEvent)
@@ -89,7 +90,7 @@ public class wemapsdk: UIView, WKUIDelegate {
         webView = WKWebView(frame: frame, configuration: mapViewConfig)
         webView.navigationDelegate = self
         webView.uiDelegate = self
-
+        
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.backgroundColor = .clear
@@ -221,6 +222,9 @@ public class wemapsdk: UIView, WKUIDelegate {
     }
     func onPermissionsDenied(deniedPermissions: [String]){
         delegate?.onPermissionsDenied?(self, deniedPermissions: deniedPermissions)
+    }
+    func onInaccurateMagnetometer() {
+        delegate?.onInaccurateMagnetometer?(self)
     }
 }
 
@@ -491,6 +495,10 @@ extension wemapsdk: WKScriptMessageHandler {
                 onPermissionsDenied(deniedPermissions: deniedPermissions)
             }
             
+        case .onInaccurateMagnetometer:
+            // debugPrint("Magnetometer inaccurate")
+            onInaccurateMagnetometer()
+            
 
         default:
             debugPrint("WARNING: Not supported message: \(message.name)")
@@ -628,7 +636,11 @@ extension wemapsdk {
                     window.webkit.messageHandlers.onPermissionsDenied
                         .postMessage(json);
                 }
-                
+        
+                const onInaccurateMagnetometerCallback = () => { window.webkit.messageHandlers.onInaccurateMagnetometer.postMessage({type: 'inaccurateMagnetometer'});
+                };
+        
+                promise = window.livemap.addEventListener('inaccurateMagnetometer', onInaccurateMagnetometerCallback);
                 promise = window.livemap.addEventListener('permissionsDenied',
                     onPermissionsDeniedCallback);
                 promise = window.livemap.addEventListener('eventOpen', onEventOpenCallback);
@@ -1067,6 +1079,18 @@ extension wemapsdk {
         let script = "window.livemap.forceARViewMode('\(mode)')"
         webView.evaluateJavaScript(script)
     }
+    /*
+    public func clearCacheWebView()
+    {
+        let dataStore = WKWebsiteDataStore.default()
+        let websiteDataTypes = WKWebsiteDataStore.allWebsiteDataTypes()
+        let date = Date(timeIntervalSince1970: 0)
+
+        dataStore.removeData(ofTypes: websiteDataTypes, modifiedSince: date) {
+            print("clear the cache ")
+        }
+    }*/
+    
 }
 
 /// Create a map filter
@@ -1178,6 +1202,7 @@ enum WebCommands: String {
     case onIndoorLevelChanged
     case onIndoorLevelsChanged
     case onPermissionsDenied
+    case onInaccurateMagnetometer
 
     // RG stuffs
     case onBookEventClicked
@@ -1211,5 +1236,6 @@ enum WebCommands: String {
                          // onFloorChanged.rawValue,
                          onIndoorLevelChanged.rawValue,
                          onIndoorLevelsChanged.rawValue,
-                         onPermissionsDenied.rawValue]
+                         onPermissionsDenied.rawValue,
+                         onInaccurateMagnetometer.rawValue]
 }
