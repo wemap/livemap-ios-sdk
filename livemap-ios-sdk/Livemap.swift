@@ -471,10 +471,10 @@ extension wemapsdk: WKScriptMessageHandler {
             
         case .onIndoorLevelChanged:
             if let json = message.body as? NSDictionary {
-                let indoorLevel = json["indoorLevel"] as! NSDictionary
-                let name = indoorLevel["name"] as! String
-                let short_name = indoorLevel["short_name"] as! String
-                let level = indoorLevel["level"] as! Double
+                let indoorLevel = json["indoorLevel"] as? NSDictionary
+                let name = indoorLevel?["name"] as? String
+                let short_name = indoorLevel?["short_name"] as? String
+                let level = indoorLevel?["level"] as? Double
             
                 onIndoorLevelChanged(data: ["name": name,
                                             "short_name": short_name,
