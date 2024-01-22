@@ -625,11 +625,11 @@ extension wemapsdk {
                 */
         
                 const onIndoorLevelChangedCallback = (json) => {
-                    window.webkit.messageHandlers.onIndoorLevelChangedCallback.postMessage(json);
+                    window.webkit.messageHandlers.onIndoorLevelChanged.postMessage(json);
                 }
         
                 const onIndoorLevelsChangedCallback = (json) => {
-                    window.webkit.messageHandlers.onIndoorLevelsChangedCallback.postMessage(json);
+                    window.webkit.messageHandlers.onIndoorLevelsChanged.postMessage(json);
                 }
         
                 const onPermissionsDeniedCallback = (json) => {
